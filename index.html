@@ -242,6 +242,11 @@ footer, .rodape{text-align:center!important}
       <button class="btn bp lbtn" type="submit" id="btn-login">Entrar</button>
     </form>
     <div class="lrod">Acesso restrito ao e-mail institucional @fiemg.com.br<br/>Problemas? Fale com o administrador.</div>
+    <div style="margin-top:18px;border-top:1px solid #e5e7eb;padding-top:14px">
+      <p style="font-size:.73rem;color:#9ca3af;margin-bottom:8px">Acesso de desenvolvimento / teste:</p>
+      <button type="button" class="btn" onclick="bypassLogin('admin')" style="width:100%;justify-content:center;padding:9px;font-size:.83rem;background:#f0fdf4;color:#166534;border:1.5px solid #86efac;">🔧 Entrar como Admin (dev)</button>
+      <button type="button" class="btn" onclick="bypassLogin('professor')" style="width:100%;justify-content:center;padding:9px;font-size:.83rem;margin-top:6px;background:#eff6ff;color:#1d4ed8;border:1.5px solid #93c5fd;">👤 Entrar como Professor (dev)</button>
+    </div>
   </div>
   <!-- FIX 4: rodapé centralizado -->
   <div class="lfooter">
@@ -540,6 +545,22 @@ function gerarNomeAuto(){
   if(etapa)nome+="-"+etapa;
   if(discCod)nome+="-"+discCod;
   if(G("cab-nome-auto"))G("cab-nome-auto").value=nome;
+}
+
+// ===== BYPASS DE DESENVOLVIMENTO =====
+function bypassLogin(role){
+  const perfis={
+    admin:{uid:"dev-admin-001",email:"thales.garcia@fiemg.com.br",nome:"Thales Garcia (Dev)",role:"admin"},
+    professor:{uid:"dev-prof-001",email:"professor@fiemg.com.br",nome:"Professor Teste (Dev)",role:"professor"}
+  };
+  const p=perfis[role]||perfis.professor;
+  // Mock do objeto CU (sem Firebase real)
+  CU={uid:p.uid,email:p.email,updatePassword:async()=>{}};
+  UD={nome:p.nome,role:p.role,email:p.email,primeiroAcesso:false};
+  pgShow("pg-app");
+  buildSide();
+  irDash();
+  iniciarAutoSave();
 }
 
 // ===== AUTH =====
