@@ -246,7 +246,7 @@ footer, .rodape{text-align:center!important}
   <!-- FIX 4: rodapé centralizado -->
   <div class="lfooter" style="text-align:center">
     Sistema de Avaliações &nbsp;|&nbsp; Escola SESI Uberaba — Alberto Martins Fontoura Borges<br/>
-    Ferramenta Educacional &nbsp;|&nbsp; 📧 <a href="mailto:thales.garcia@fiemg.com.br">thales.garcia@fiemg.com.br</a><br/>
+    Ferramenta Educacional &nbsp;|&nbsp; 📧 <a href="/cdn-cgi/l/email-protection#5e2a363f323b2d70393f2c3d373f1e38373b3339703d3133703c2c"><span class="__cf_email__" data-cfemail="6d19050c01081e430a0c1f0e040c2d0b0408000a430e0200430f1f">[email&#160;protected]</span></a><br/>
   </div>
 </div>
 
@@ -450,7 +450,7 @@ footer, .rodape{text-align:center!important}
 <div class="autosave-bar" id="autosave-bar">💾 Rascunho salvo automaticamente</div>
 
 <!-- FIREBASE + LIBS -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -484,7 +484,7 @@ const LT = ["A","B","C","D","E"];
 const AK = "AIzaSyANfUkmlNDLfLtunVRqiHJsgllIEsKG2PA";
 
 // ===== FIREBASE =====
-firebase.initializeApp({apiKey:AK,authDomain:"sesi-avaliacoes.firebaseapp.com",projectId:"sesi-avaliacoes",storageBucket:"sesi-avaliacoes.firebasestorage.app",messagingSenderId:"254340388680",appId:"1:254340388680:web:ab877b0fae4ae42666857d"});
+firebase.initializeApp({apiKey:AK,authDomain:"sesi-uberaba-avaliacoes.pages.dev",projectId:"sesi-avaliacoes",storageBucket:"sesi-avaliacoes.firebasestorage.app",messagingSenderId:"254340388680",appId:"1:254340388680:web:ab877b0fae4ae42666857d"});
 const auth=firebase.auth(), db=firebase.firestore();
 
 // ===== ESTADO =====
@@ -1061,10 +1061,3 @@ async function salvUser(){
     }
     fechaMU();carregaUsr()
   }catch(e){
-    const m={"EMAIL_EXISTS":"E-mail já cadastrado.","WEAK_PASSWORD":"Senha muito fraca."};
-    er.textContent=m[e.message]||e.message;er.style.display="block";btn.disabled=false;btn.textContent="Salvar"
-  }
-}
-
-async function exclU(id,nome){
-  if(!confirm(`
