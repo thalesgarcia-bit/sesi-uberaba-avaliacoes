@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SESI Avaliações</title>
+<link rel="icon" href="logo-sesi.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--azul:#1a3a6b;--azul-m:#1e4d9b;--azul-cl:#e8eff9;--vermelho:#e53935;--cinza:#f5f6fa;--cinza-m:#dde1ea;--cinza-e:#6b7280;--sombra:0 2px 12px rgba(26,58,107,.10);--sombra-h:0 6px 24px rgba(26,58,107,.18);--r:10px;--rl:16px}
+body{font-family:'Inter',sans-serif;background:var(--cinza);color:#1a1a2e;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+input,select,textarea{font-family:inherit;outline:none}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--cinza)}::-webkit-scrollbar-thumb{background:var(--cinza-m);border-radius:3px}
+
+/* PÁGINAS */
+.pg{display:none!important}.pg.on{display:block!important}
+
+/* BOTÕES */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:var(--r);font-weight:600;font-size:.93rem;transition:all .2s;cursor:pointer;border:none}
+.bp{background:var(--azul);color:#fff}.bp:hover{background:var(--azul-m);box-shadow:var(--sombra-h);transform:translateY(-1px)}
+.bs{background:#fff;color:var(--azul);border:1.5px solid var(--azul)}.bs:hover{background:var(--azul-cl)}
+.bd{background:var(--vermelho);color:#fff}.bd:hover{opacity:.88}
+.bsm{padding:7px 14px;font-size:.83rem}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+
+/* CARD */
+.card{background:#fff;border-radius:var(--rl);box-shadow:var(--sombra);padding:24px}
+
+/* BADGE */
+.badge{display:inline-block;padding:3px 12px;border-radius:99px;font-size:.78rem;font-weight:600}
+.bp-r{background:#dbeafe;color:#1d4ed8}.bc-r{background:#d1fae5;color:#065f46}.ba-r{background:#fef3c7;color:#92400e}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:6px}
+.fl{font-size:.85rem;font-weight:600;color:var(--cinza-e)}
+.fi,.fs,.ft{padding:10px 14px;border:1.5px solid var(--cinza-m);border-radius:var(--r);font-size:.95rem;transition:border .2s;background:#fff;width:100%}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--azul-m)}
+.ft{resize:vertical;min-height:80px}
+
+/* ALERT */
+.ae{padding:10px 14px;border-radius:var(--r);font-size:.88rem;background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c}
+.ao{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+
+/* SPINNER */
+.sp{width:36px;height:36px;border:4px solid var(--cinza-m);border-top-color:var(--azul);border-radius:50%;animation:spin .8s linear infinite;margin:auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOGIN */
+#pg-login{min-height:100vh;background:linear-gradient(135deg,#1a3a6b 0%,#1e4d9b 60%,#2563c7 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.lcard{background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:44px 40px 36px;width:100%;max-width:420px;text-align:center}
+.llogo{width:110px;margin-bottom:10px}
+.lesc{font-size:.72rem;font-weight:700;color:var(--azul);letter-spacing:.05em;text-transform:uppercase;margin-bottom:22px;line-height:1.4}
+.ltit{font-size:1.7rem;font-weight:800;color:var(--azul);margin-bottom:4px}
+.lsub{font-size:.83rem;color:var(--cinza-e);margin-bottom:28px;line-height:1.4}
+.lform{display:flex;flex-direction:column;gap:16px;text-align:left}
+.lbtn{width:100%;justify-content:center;padding:13px;font-size:1rem;margin-top:4px}
+.lrod{margin-top:22px;font-size:.76rem;color:#9ca3af;line-height:1.6}
+.sobre{margin-top:24px;color:rgba(255,255,255,.72);font-size:.82rem;text-align:center;line-height:1.8}
+
+/* LAYOUT */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;min-height:100vh;background:linear-gradient(180deg,#1a3a6b 0%,#1e4d9b 100%);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s}
+.sbh{padding:28px 20px 20px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;gap:10px}
+.sblogo{width:90px;object-fit:contain}
+.sbsch{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.65);letter-spacing:.08em;text-align:center}
+.sbnav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:4px}
+.sblnk{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,.75);font-size:.9rem;font-weight:500;transition:all .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.sblnk:hover{background:rgba(255,255,255,.10);color:#fff}
+.sblnk.on{background:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.sbu{padding:16px 14px;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;gap:8px}
+.sbun{color:#fff;font-weight:600;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbout{background:rgba(255,255,255,.10);color:rgba(255,255,255,.8);border:none;border-radius:8px;padding:8px 12px;font-size:.85rem;cursor:pointer;transition:background .2s;text-align:left}
+.sbout:hover{background:rgba(255,255,255,.20);color:#fff}
+.mc{flex:1;margin-left:240px;padding:32px}
+.ptit{font-size:1.6rem;font-weight:800;color:var(--azul);margin-bottom:6px}
+.psub{color:var(--cinza-e);font-size:.92rem;margin-bottom:28px}
+
+/* MOBILE */
+.mbar{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:var(--azul);align-items:center;justify-content:space-between;padding:0 16px;z-index:200}
+.mlogo{width:56px}
+.hbg{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
+.sbo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+
+/* DASHBOARD */
+.dtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.fltrs{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:24px;padding:16px 20px}
+.fltrs select{min-width:180px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.avc{display:flex;flex-direction:column;gap:10px;transition:box-shadow .2s,transform .2s}
+.avc:hover{box-shadow:var(--sombra-h);transform:translateY(-2px)}
+.avt{display:flex;justify-content:space-between;align-items:center}
+.avd{background:var(--azul-cl);color:var(--azul);font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:99px}
+.avdt{font-size:.76rem;color:var(--cinza-e)}
+.ava{font-weight:700;font-size:.97rem}
+.avm{display:flex;gap:14px;font-size:.81rem;color:var(--cinza-e);flex-wrap:wrap}
+.avac{display:flex;gap:8px;margin-top:4px}
+.avac .btn{flex:1;justify-content:center;font-size:.83rem;padding:8px 10px}
+.vz{text-align:center;padding:60px 24px}
+.vzi{font-size:3rem;margin-bottom:12px}
+.vzt{font-size:1.05rem;font-weight:600;color:var(--cinza-e)}
+
+/* EDITOR */
+.etop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.eac{display:flex;gap:10px;flex-wrap:wrap}
+.esub{font-size:.83rem;color:var(--cinza-e);margin-top:3px}
+.sbox{background:#fff;border-radius:var(--rl);box-shadow:var(--sombra);padding:24px;margin-bottom:20px}
+.stit{font-size:1.05rem;font-weight:700;color:var(--azul);margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--azul-cl)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.qbox{background:#fff;border-radius:var(--rl);box-shadow:var(--sombra);padding:22px;margin-bottom:16px;border-left:4px solid var(--azul-m)}
+.qhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.qnum{font-weight:800;font-size:1rem;color:var(--azul)}
+.qac{display:flex;gap:6px}
+.qb{background:var(--cinza);border:1.5px solid var(--cinza-m);border-radius:7px;padding:5px 10px;font-size:.85rem;cursor:pointer;transition:all .15s}
+.qb:hover{background:var(--azul-cl);border-color:var(--azul-m)}
+.qb.del:hover{background:#fef2f2;border-color:var(--vermelho);color:var(--vermelho)}
+.qb:disabled{opacity:.35;cursor:not-allowed}
+.qhi{font-size:.77rem;color:var(--cinza-e);margin-top:3px}
+.qia{background:var(--cinza);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.qip{display:flex;flex-direction:column;align-items:center;gap:10px;background:#fff;border-radius:var(--r);padding:12px}
+.qar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.qal{font-weight:700;color:var(--azul);min-width:22px;font-size:.95rem}
+
+/* PREVIEW */
+.pvbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.pvcon{display:flex;justify-content:center;background:#9ca3af;padding:28px;border-radius:var(--rl);overflow-x:auto}
+.a4{background:#fff;width:794px;min-height:1123px;padding:52px 60px;box-shadow:0 4px 32px rgba(0,0,0,.25);font-family:Arial,sans-serif;color:#000;line-height:1.4;flex-shrink:0}
+.fc{border:1.5px solid #000;margin-bottom:8px}
+.flr{display:flex;align-items:center;gap:14px;padding:7px 10px;border-bottom:1px solid #000}
+.flogo{width:66px;object-fit:contain}
+.fesc{font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.ftb{width:100%;border-collapse:collapse}
+.ftb td{border:1px solid #000;padding:4px 7px;font-size:inherit;vertical-align:top}
+.fal{display:inline-block;border-bottom:1px solid #000;min-width:320px;height:11px}
+.fins{border:1.5px solid #000;padding:7px 12px;margin-bottom:12px}
+.fint{font-weight:700;font-style:italic;margin-bottom:3px}
+.fini{font-style:italic;line-height:1.5;font-size:inherit}
+.fqs{display:flex;flex-direction:column}
+.fq{margin-bottom:10pt}
+.fqt{font-weight:700;margin-bottom:6pt}
+.fqe{text-indent:2.5em;text-align:justify;margin-bottom:6pt}
+.fqi{display:flex;flex-direction:column;align-items:center;gap:3px;margin:6pt 0}
+.fqr{font-size:8pt;text-align:center;color:#333}
+.fqa{display:flex;gap:4px;margin-bottom:3pt}
+.fqa:last-child{margin-bottom:0}
+
+/* USUÁRIOS */
+.twrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+thead th{text-align:left;padding:12px 14px;background:var(--azul-cl);color:var(--azul);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--cinza-m);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--cinza)}
+.tda{display:flex;gap:8px}
+.uem{font-size:.82rem;color:var(--cinza-e)}
+
+/* MODAL */
+.mov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:16px}
+.mov.on{display:flex}
+.mbox{background:#fff;border-radius:var(--rl);box-shadow:var(--sombra-h);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.mhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.mhd h2{font-size:1.1rem;font-weight:700;color:var(--azul)}
+.mcl{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--cinza-e)}
+.mbdy{display:flex;flex-direction:column;gap:14px}
+.mft{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--cinza-m)}
+.dchk{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;background:var(--cinza);border-radius:var(--r);max-height:180px;overflow-y:auto}
+.chi{display:flex;align-items:center;gap:6px;font-size:.83rem;cursor:pointer}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.on{transform:translateX(0)}
+  .sbo.on{display:block}.mbar{display:flex}
+  .mc{margin-left:0;margin-top:56px;padding:20px 16px}
+}
+@media(max-width:480px){.lcard{padding:32px 20px 26px}}
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div id="pg-login" class="pg on">
+  <div class="lcard">
+    <img src="logo-sesi.png" alt="SESI" class="llogo"/>
+    <div class="lesc">ALBERTO MARTINS FONTOURA BORGES</div>
+    <h1 class="ltit">SESI Avaliações</h1>
+    <p class="lsub">Sistema de Formatação de Instrumentos Avaliativos</p>
+    <form class="lform" id="form-login">
+      <div class="fg"><label class="fl">E-mail institucional</label><input class="fi" type="email" id="lin-email" placeholder="seu.nome@fiemg.com.br" required/></div>
+      <div class="fg"><label class="fl">Senha</label><input class="fi" type="password" id="lin-senha" placeholder="••••••••" required/></div>
+      <div id="lin-erro" class="ae" style="display:none"></div>
+      <button class="btn bp lbtn" type="submit" id="btn-login">Entrar</button>
+    </form>
+    <div class="lrod">Acesso restrito ao e-mail institucional @fiemg.com.br<br/>Problemas? Fale com o administrador.</div>
+  </div>
+  <div class="sobre"><strong>Idealizador e Desenvolvedor:</strong> Prof. Thales Garcia — Linguagens<br/><strong>Apoio:</strong> Profa. Lívia Paiva — Linguagens</div>
+</div>
+
+<!-- ========== APP (SIDEBAR + CONTEÚDO) ========== -->
+<div id="pg-app" class="pg">
+  <div class="mbar"><img src="logo-sesi.png" class="mlogo" alt="SESI"/><button class="hbg" id="hbg">☰</button></div>
+  <div class="sbo" id="sbo"></div>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sbh"><img src="logo-sesi.png" class="sblogo" alt="SESI"/><div class="sbsch">SESI AVALIAÇÕES</div></div>
+      <nav class="sbnav" id="sbnav"></nav>
+      <div class="sbu"><div class="sbun" id="sb-nome"></div><div id="sb-role"></div><button class="sbout" id="btn-sair">🚪 Sair</button></div>
+    </aside>
+    <main class="mc">
+
+      <!-- DASHBOARD -->
+      <div id="vw-dash" style="display:none">
+        <div class="dtop">
+          <div><h1 class="ptit" id="dash-tit">Minhas Avaliações</h1><p class="psub" id="dash-sub"></p></div>
+          <div id="dash-ac"></div>
+        </div>
+        <div class="fltrs card" id="fltrs" style="display:none">
+          <strong style="color:var(--azul);white-space:nowrap">🔍 Filtrar:</strong>
+          <select class="fs" id="f-disc" onchange="renderLista()"><option value="">Todas as disciplinas</option></select>
+          <select class="fs" id="f-seg" onchange="renderLista()"><option value="">Todos os segmentos</option><option>Ensino Fundamental Anos Iniciais</option><option>Ensino Fundamental Anos Finais</option><option>Ensino Médio</option></select>
+          <select class="fs" id="f-eta" onchange="renderLista()"><option value="">Todas as etapas</option><option value="1ª Etapa">1ª Etapa</option><option value="2ª Etapa">2ª Etapa</option><option value="3ª Etapa">3ª Etapa</option></select>
+        </div>
+        <div id="lista"><div class="sp" style="margin-top:60px"></div></div>
+      </div>
+
+      <!-- EDITOR -->
+      <div id="vw-ed" style="display:none">
+        <div class="etop">
+          <div><h1 class="ptit" id="ed-tit">Nova Avaliação</h1><p class="esub" id="ed-sub">Fonte Arial 11pt · Ensino Fundamental (A–D)</p></div>
+          <div class="eac">
+            <button class="btn bp" id="btn-ae" onclick="mudaAba('ed')">✏️ Editar</button>
+            <button class="btn bs" id="btn-ap" onclick="mudaAba('pv')">👁️ Prévia</button>
+            <button class="btn bp" id="btn-sv" onclick="salvar()">💾 Salvar</button>
+          </div>
+        </div>
+        <!-- Aba editar -->
+        <div id="aba-ed">
+          <div class="sbox">
+            <div class="stit">📋 Cabeçalho da Avaliação</div>
+            <div class="cgrid">
+              <div class="fg"><label class="fl">Atividade *</label><select class="fs" id="cab-atv"></select></div>
+              <div class="fg"><label class="fl">Disciplina *</label><select class="fs" id="cab-dsc"></select></div>
+              <div class="fg"><label class="fl">Turno *</label><select class="fs" id="cab-trn"></select></div>
+              <div class="fg"><label class="fl">Segmento *</label><select class="fs" id="cab-sgm" onchange="atuSeg()"></select></div>
+              <div class="fg"><label class="fl">Professor(a) *</label><input class="fi" id="cab-prf"/></div>
+              <div class="fg"><label class="fl">Data</label><input class="fi" id="cab-dat"/></div>
+              <div class="fg"><label class="fl">Turma *</label><select class="fs" id="cab-trm"></select></div>
+              <div class="fg"><label class="fl">Valor total</label><input class="fi" id="cab-vlr" placeholder="Ex: 10 pontos"/></div>
+            </div>
+          </div>
+          <div class="sbox">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <div class="stit" style="margin:0;border:none;padding:0">📝 Questões (<span id="tq">0</span>)</div>
+              <button class="btn bp bsm" onclick="addQ()">+ Adicionar</button>
+            </div>
+            <div id="qcon"></div>
+            <div style="display:flex;justify-content:center;margin-top:8px"><button class="btn bs" onclick="addQ()">+ Adicionar Questão</button></div>
+          </div>
+        </div>
+        <!-- Aba preview -->
+        <div id="aba-pv" style="display:none">
+          <div class="pvbar card">
+            <span style="font-weight:700;color:var(--azul)">📄 Prévia do documento final</span>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn bs" onclick="expWord()">📝 Baixar Word (.docx)</button>
+              <button class="btn bp" onclick="expPDF()">📕 Baixar PDF</button>
+            </div>
+          </div>
+          <div class="pvcon"><div class="a4" id="a4"></div></div>
+        </div>
+      </div>
+
+      <!-- USUÁRIOS -->
+      <div id="vw-usr" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <h1 class="ptit" style="margin:0">👥 Gerenciar Usuários</h1>
+          <button class="btn bp" onclick="abrirMU()">+ Novo Usuário</button>
+        </div>
+        <div class="card twrap" id="tbl-usr"><div class="sp" style="margin:40px auto"></div></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL USUÁRIO -->
+<div class="mov" id="modal-u">
+  <div class="mbox">
+    <div class="mhd"><h2 id="mu-tit">Novo Usuário</h2><button class="mcl" onclick="fechaMU()">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label class="fl">Nome completo *</label><input class="fi" id="u-nm"/></div>
+      <div class="fg"><label class="fl">E-mail *</label><input class="fi" type="email" id="u-em" placeholder="nome@fiemg.com.br"/></div>
+      <div class="fg" id="u-gsen"><label class="fl">Senha inicial *</label><input class="fi" type="password" id="u-sen"/></div>
+      <div class="fg"><label class="fl">Perfil *</label>
+        <select class="fs" id="u-rl" onchange="togCoord()">
+          <option value="professor">Professor</option>
+          <option value="coordenador">Coordenador de Área</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <div id="u-gco" style="display:none;flex-direction:column;gap:14px">
+        <div class="fg"><label class="fl">Área de coordenação</label>
+          <select class="fs" id="u-ar" onchange="preencDisc()">
+            <option value="">Selecione...</option>
+            <option>Linguagens</option><option>Exatas</option><option>Humanas</option><option>Saúde e Expressão</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Disciplinas com acesso</label><div class="dchk" id="dchk"></div></div>
+      </div>
+      <div id="u-err" class="ae" style="display:none"></div>
+    </div>
+    <div class="mft">
+      <button class="btn bs" onclick="fechaMU()">Cancelar</button>
+      <button class="btn bp" id="btn-su" onclick="salvUser()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE + LIBS -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.2.3/docx.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ===== DADOS =====
+const ESC_NOME = "ALBERTO MARTINS FONTOURA BORGES";
+const ATIV = ["Autoavaliação","Avaliação 1ª Etapa Letiva","Avaliação 2ª Etapa Letiva","Avaliação 3ª Etapa Letiva","Avaliação de Recuperação 1ª Etapa Letiva","Avaliação de Recuperação 2ª Etapa Letiva","Avaliação de Recuperação Final","Trabalho Avaliativo","Trabalho Interdisciplinar","Relatório","Seminário","Simulado Interno 1ª Etapa Letiva","Simulado Interno 2ª Etapa Letiva","Simulado Interno 3ª Etapa Letiva"];
+const DISC = ["ARTE","CIÊNCIAS","EDUCAÇÃO FÍSICA","GEOGRAFIA","HISTÓRIA","LÍNGUA INGLESA","LÍNGUA PORTUGUESA","LITERATURA","LITERATURA INFANTIL","MATEMÁTICA","MÚSICA","OFICINA DE ROBÓTICA","PRODUÇÃO DE TEXTO"];
+const TURN = ["Matutino","Vespertino"];
+const SEGS = ["Ensino Fundamental Anos Iniciais","Ensino Fundamental Anos Finais","Ensino Médio"];
+const TURM_EF = ["EF-2A-T-12210-26","EF-4-T-12210-2026","EF-4A-T-12210-26","EF-4B-T-12210-26","EF-5-T-12210-2026","EF-5A-T-12210-26","EF-5B-T-12210-26","EF-6-M-12210-2026","EF-6A-M-12210-26","EF-6B-M-12210-26","EF-7-M-12210-2026","EF-7A-M-12210-26","EF-7B-M-12210-2026","EF-8-M-12210-2026","EF-8A-M-12210-26","EF-8B-M-12210-26","EF-9-M-12210-2026","EF-9A-M-12210-26","EF-9B-M-12210-26","EF-9C-M-12210-26"];
+const TURM_EM = [];
+const AREAS = {"Linguagens":["ARTE","LÍNGUA INGLESA","LÍNGUA PORTUGUESA","LITERATURA","LITERATURA INFANTIL","PRODUÇÃO DE TEXTO"],"Exatas":["CIÊNCIAS","MATEMÁTICA","OFICINA DE ROBÓTICA"],"Humanas":["GEOGRAFIA","HISTÓRIA"],"Saúde e Expressão":["EDUCAÇÃO FÍSICA","MÚSICA"]};
+const INST = ["No cabeçalho, preencha seu nome completo.","Leia com atenção todas as questões antes de começar a responder e, ao terminar, revise sua prova.","Use caneta azul ou preta para responder. Respostas a lápis não poderão ser revisadas.","Escreva de forma clara e cuide da sua grafia, para que sua prova seja bem compreendida.","Você será avaliado pelo que escreveu, então, capriche nas respostas.","Evite rasuras. Caso precise corrigir, risque de forma legível e continue.","Lembre-se de incluir justificativas ou cálculos nas questões que pedirem.","O aluno que estiver suspenso ou for surpreendido em situação de fraude (cola) não terá direito à segunda chamada.","Não haverá segunda chamada para as provas de recuperação.","Lembre-se de que essa atividade, avaliativa, é um documento."];
+const LT = ["A","B","C","D","E"];
+const AK = "AIzaSyANfUkmlNDLfLtunVRqiHJsgllIEsKG2PA";
+
+// ===== FIREBASE =====
+firebase.initializeApp({apiKey:AK,authDomain:"sesi-avaliacoes.firebaseapp.com",projectId:"sesi-avaliacoes",storageBucket:"sesi-avaliacoes.firebasestorage.app",messagingSenderId:"254340388680",appId:"1:254340388680:web:ab877b0fae4ae42666857d"});
+const auth=firebase.auth(), db=firebase.firestore();
+
+// ===== ESTADO =====
+let CU=null, UD=null, Qs=[], docId=null, abaEd="ed", avsAll=[], usrCache=[], editUID=null, vwAtual="dash";
+
+// ===== UTILS =====
+const G=id=>document.getElementById(id);
+const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+function sel(id,ops,ph="Escolher um item."){const e=G(id);if(!e)return;e.innerHTML=`<option value="">${ph}</option>`+ops.map(o=>`<option value="${o}">${o}</option>`).join("")}
+function pgShow(id){document.querySelectorAll(".pg").forEach(p=>{p.classList.remove("on")});G(id).classList.add("on")}
+function vwShow(v){["vw-dash","vw-ed","vw-usr"].forEach(x=>G(x).style.display=x===`vw-${v}`?"block":"none");vwAtual=v;sideHL()}
+function sideHL(){document.querySelectorAll(".sblnk").forEach(l=>l.classList.toggle("on",l.dataset.v===vwAtual))}
+const isEM=()=>G("cab-sgm")?.value==="Ensino Médio";
+const nAlts=()=>isEM()?5:4;
+function pontos(v){const n=parseFloat(String(v||"").replace(",","."));return isNaN(n)?"pontos":n===1?"ponto":"pontos"}
+
+// ===== AUTH =====
+auth.onAuthStateChanged(async user=>{
+  if(!user){pgShow("pg-login");return}
+  CU=user;
+  const sn=await db.collection("usuarios").doc(user.uid).get();
+  UD=sn.exists?sn.data():{role:"professor",nome:user.email};
+  pgShow("pg-app");
+  buildSide();
+  irDash();
+});
+
+// ===== LOGIN =====
+G("form-login").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const em=G("lin-email").value.trim(), sn=G("lin-senha").value;
+  const btn=G("btn-login"), er=G("lin-erro");
+  er.style.display="none";
+  if(!em.endsWith("@fiemg.com.br")){er.textContent="Utilize seu e-mail institucional (@fiemg.com.br).";er.style.display="block";return}
+  btn.disabled=true;btn.textContent="Entrando...";
+  try{await auth.signInWithEmailAndPassword(em,sn)}
+  catch(err){const m={"auth/invalid-credential":"E-mail ou senha incorretos.","auth/user-not-found":"Usuário não encontrado.","auth/wrong-password":"Senha incorreta.","auth/too-many-requests":"Muitas tentativas. Tente mais tarde."};er.textContent=m[err.code]||"Erro ao fazer login.";er.style.display="block";btn.disabled=false;btn.textContent="Entrar"}
+});
+
+// ===== SIDEBAR =====
+function buildSide(){
+  const role=UD.role||"professor", nome=UD.nome||CU.email;
+  G("sb-nome").textContent=nome;
+  const lb={professor:"Professor",coordenador:"Coordenador",admin:"Administrador"};
+  const bc={professor:"bp-r",coordenador:"bc-r",admin:"ba-r"};
+  G("sb-role").innerHTML=`<span class="badge ${bc[role]}">${lb[role]}</span>`;
+  const lks={professor:[{v:"dash",i:"📋",t:"Minhas Avaliações"},{v:"nova",i:"✏️",t:"Nova Avaliação"}],coordenador:[{v:"dash",i:"🏠",t:"Painel"},{v:"dash",i:"📂",t:"Avaliações"}],admin:[{v:"dash",i:"🏠",t:"Painel"},{v:"dash",i:"📂",t:"Avaliações"},{v:"usr",i:"👥",t:"Usuários"}]};
+  G("sbnav").innerHTML=(lks[role]||lks.professor).map(l=>`<button class="sblnk" data-v="${l.v}" onclick="navTo('${l.v}')"><span>${l.i}</span>${l.t}</button>`).join("");
+  G("btn-sair").onclick=()=>auth.signOut();
+  G("hbg").onclick=()=>{G("sidebar").classList.toggle("on");G("sbo").classList.toggle("on")};
+  G("sbo").onclick=()=>{G("sidebar").classList.remove("on");G("sbo").classList.remove("on")};
+}
+function navTo(v){
+  G("sidebar").classList.remove("on");G("sbo").classList.remove("on");
+  if(v==="nova"){novoEd();return}
+  if(v==="usr"){vwShow("usr");carregaUsr();return}
+  irDash();
+}
+
+// ===== DASHBOARD =====
+async function irDash(){
+  vwShow("dash");
+  const role=UD.role||"professor";
+  const t={professor:"Minhas Avaliações",coordenador:"Avaliações da Área",admin:"Todas as Avaliações"};
+  G("dash-tit").textContent=t[role];
+  G("dash-sub").textContent=`Bem-vindo(a), ${UD.nome||CU.email}`;
+  G("dash-ac").innerHTML=role==="professor"?`<button class="btn bp" onclick="novoEd()">✏️ Nova Avaliação</button>`:role==="admin"?`<button class="btn bp" onclick="navTo('usr')">👥 Gerenciar Usuários</button>`:"";
+  if(role!=="professor"){
+    G("fltrs").style.display="flex";
+    const ds=role==="coordenador"?(UD.disciplinas||[]):DISC;
+    G("f-disc").innerHTML=`<option value="">Todas as disciplinas</option>`+ds.map(d=>`<option value="${d}">${d}</option>`).join("");
+  }
+  G("lista").innerHTML=`<div class="sp" style="margin-top:60px"></div>`;
+  let q=db.collection("avaliacoes").orderBy("criadoEm","desc");
+  if(role==="professor") q=q.where("autorId","==",CU.uid);
+  else if(role==="coordenador"){const ds=UD.disciplinas||[];if(ds.length)q=q.where("disciplina","in",ds)}
+  try{const sn=await q.get();avsAll=sn.docs.map(d=>({id:d.id,...d.data()}))}catch(e){avsAll=[]}
+  renderLista();
+}
+function renderLista(){
+  const fD=G("f-disc")?.value||"",fS=G("f-seg")?.value||"",fE=G("f-eta")?.value||"";
+  const role=UD.role||"professor";
+  const ls=avsAll.filter(a=>{if(fD&&a.disciplina!==fD)return false;if(fS&&a.segmento!==fS)return false;if(fE&&!a.atividade?.includes(fE))return false;return true});
+  const can=role==="professor"||role==="admin";
+  if(!ls.length){G("lista").innerHTML=`<div class="vz card"><div class="vzi">📋</div><div class="vzt">Nenhuma avaliação encontrada</div>${role==="professor"?`<button class="btn bp" style="margin-top:16px" onclick="novoEd()">✏️ Criar primeira avaliação</button>`:""}</div>`;return}
+  G("lista").innerHTML=`<div class="grid">${ls.map(av=>{const dt=av.criadoEm?.toDate?.()?.toLocaleDateString("pt-BR")||"—";return`<div class="avc card"><div class="avt"><span class="avd">${av.disciplina||"—"}</span><span class="avdt">${dt}</span></div><div class="ava">${av.atividade||"—"}</div><div class="avm"><span>🏫 ${av.turma||"—"}</span><span>👤 ${av.professorNome||"—"}</span></div><div class="avm"><span>📚 ${av.segmento||"—"}</span><span>🌅 ${av.turno||"—"}</span></div><div class="avac"><button class="btn ${can?"bs":"bs"}" onclick="abrirEd('${av.id}',${!can})">${can?"✏️ Editar":"👁️ Ver"}</button><button class="btn bp" onclick="abrirEd('${av.id}',false,'pv')">📄 Exportar</button></div></div>`}).join("")}</div>`;
+}
+
+// ===== EDITOR =====
+function novaQ(){return{id:Date.now()+Math.random(),enunciado:"",valor:"",imagem:null,imagemRef:"",imagemTamanho:80,alternativas:Array(nAlts()).fill("")}}
+function novoEd(){docId=null;Qs=[];abaEd="ed";vwShow("ed");G("ed-tit").textContent="Nova Avaliação";G("btn-sv").style.display="";initSels();G("cab-dat").value=new Date().toLocaleDateString("pt-BR");if(UD.nome)G("cab-prf").value=UD.nome;Qs=[novaQ()];renderQ();mudaAba("ed")}
+async function abrirEd(id,soVer=false,aba="ed"){docId=id;Qs=[];vwShow("ed");G("ed-tit").textContent="Editar Avaliação";G("btn-sv").style.display=soVer?"none":"";initSels();const sn=await db.collection("avaliacoes").doc(id).get();if(sn.exists){const d=sn.data();preencCab(d.cabecalho||{});Qs=(d.questoes||[novaQ()]).map(q=>({...q,id:q.id||Date.now()+Math.random()}))}renderQ();mudaAba(aba)}
+function initSels(){sel("cab-atv",ATIV);sel("cab-dsc",DISC);sel("cab-trn",TURN,"Matutino");G("cab-trn").value="Matutino";sel("cab-sgm",SEGS);atuSeg()}
+function atuSeg(){sel("cab-trm",isEM()?TURM_EM:TURM_EF);const n=nAlts();Qs=Qs.map(q=>{const a=[...q.alternativas];while(a.length<n)a.push("");return{...q,alternativas:a.slice(0,n)}});G("ed-sub").textContent=`Fonte Arial ${isEM()?10:11}pt · ${isEM()?"Ensino Médio (A–E)":"Ensino Fundamental (A–D)"}`;renderQ()}
+function preencCab(c){["atv","dsc","trn","sgm","prf","dat","trm","vlr"].forEach((k,i)=>{const ids=["cab-atv","cab-dsc","cab-trn","cab-sgm","cab-prf","cab-dat","cab-trm","cab-vlr"];const el=G(ids[i]);const ks=["atividade","disciplina","turno","segmento","professor","data","turma","valor"];if(el&&c[ks[i]]!==undefined)el.value=c[ks[i]]});atuSeg()}
+function getCab(){return{atividade:G("cab-atv").value,disciplina:G("cab-dsc").value,turno:G("cab-trn").value,segmento:G("cab-sgm").value,professor:G("cab-prf").value,data:G("cab-dat").value,turma:G("cab-trm").value,valor:G("cab-vlr").value}}
+function addQ(){Qs.push(novaQ());renderQ()}
+function remQ(i){if(Qs.length===1){alert("Precisa ter ao menos uma questão.");return}Qs.splice(i,1);renderQ()}
+function moverQ(i,d){const j=i+d;if(j<0||j>=Qs.length)return;[Qs[i],Qs[j]]=[Qs[j],Qs[i]];renderQ()}
+function carregaImg(i,inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{Qs[i].imagem=e.target.result;renderQ()};r.readAsDataURL(f)}
+function atuHint(i){const v=Qs[i].valor||"";const p=v?`(${v} ${pontos(v)})`:"";const e=G(`hi-${i}`);if(e)e.innerHTML=`Será exibido como: <strong>QUESTÃO ${String(i+1).padStart(2,"0")} ${p}</strong>`}
+function renderQ(){
+  G("tq").textContent=Qs.length;
+  G("qcon").innerHTML=Qs.map((q,i)=>{
+    const num=String(i+1).padStart(2,"0"),v=q.valor||"",p=v?`(${v} ${pontos(v)})`:"";
+    return`<div class="qbox"><div class="qhd"><div class="qnum">QUESTÃO ${num}</div><div class="qac"><button class="qb" onclick="moverQ(${i},-1)" ${i===0?"disabled":""}>↑</button><button class="qb" onclick="moverQ(${i},1)" ${i===Qs.length-1?"disabled":""}>↓</button><button class="qb del" onclick="remQ(${i})">🗑️</button></div></div>
+    <div class="fg" style="margin-bottom:14px"><label class="fl">Pontuação</label><input class="fi" style="max-width:180px" placeholder="Ex: 1,4" value="${esc(v)}" oninput="Qs[${i}].valor=this.value;atuHint(${i})"/><div class="qhi" id="hi-${i}">Será exibido como: <strong>QUESTÃO ${num} ${p}</strong></div></div>
+    <div class="fg" style="margin-bottom:14px"><label class="fl">Enunciado</label><textarea class="ft" rows="4" placeholder="Digite o enunciado..." oninput="Qs[${i}].enunciado=this.value">${esc(q.enunciado)}</textarea></div>
+    <div class="qia"><label class="fl">Imagem (opcional)</label><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn bs bsm" onclick="G('qf-${i}').click()">🖼️ ${q.imagem?"Trocar":"Adicionar"} imagem</button>${q.imagem?`<button class="btn bd bsm" onclick="Qs[${i}].imagem=null;Qs[${i}].imagemRef='';renderQ()">✕ Remover</button>`:""}<input type="file" accept="image/*" id="qf-${i}" style="display:none" onchange="carregaImg(${i},this)"/></div>${q.imagem?`<div class="qip"><img src="${q.imagem}" style="max-width:${q.imagemTamanho||80}%;border-radius:6px"/><div style="width:100%;display:flex;flex-direction:column;gap:8px"><label class="fl">Tamanho: <span id="rtv-${i}">${q.imagemTamanho||80}%</span></label><input type="range" min="20" max="100" step="5" value="${q.imagemTamanho||80}" style="accent-color:var(--azul)" oninput="Qs[${i}].imagemTamanho=+this.value;G('rtv-${i}').textContent=this.value+'%'"/><label class="fl">Referência/Fonte</label><input class="fi" placeholder="Ex: IBGE, 2023." value="${esc(q.imagemRef||"")}" oninput="Qs[${i}].imagemRef=this.value"/></div></div>`:""}</div>
+    <div style="display:flex;flex-direction:column;gap:8px"><label class="fl">Alternativas (${isEM()?"A–E":"A–D"})</label>${q.alternativas.slice(0,nAlts()).map((alt,ai)=>`<div class="qar"><span class="qal">${LT[ai]})</span><input class="fi" placeholder="Alternativa ${LT[ai]}..." value="${esc(alt)}" oninput="Qs[${i}].alternativas[${ai}]=this.value"/></div>`).join("")}</div></div>`;
+  }).join("");
+}
+function mudaAba(a){abaEd=a;G("aba-ed").style.display=a==="ed"?"block":"none";G("aba-pv").style.display=a==="pv"?"block":"none";G("btn-ae").className="btn "+(a==="ed"?"bp":"bs");G("btn-ap").className="btn "+(a==="pv"?"bp":"bs");if(a==="pv")renderPV()}
+
+// ===== SALVAR =====
+async function salvar(){
+  const btn=G("btn-sv");btn.disabled=true;btn.textContent="Salvando...";
+  const cab=getCab();
+  const d={cabecalho:cab,questoes:Qs.map(q=>({...q})),atividade:cab.atividade,disciplina:cab.disciplina,segmento:cab.segmento,turma:cab.turma,turno:cab.turno,professorNome:cab.professor,autorId:CU.uid,atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()};
+  try{if(docId){await db.collection("avaliacoes").doc(docId).set(d,{merge:true})}else{d.criadoEm=firebase.firestore.FieldValue.serverTimestamp();const r=await db.collection("avaliacoes").add(d);docId=r.id}btn.textContent="✅ Salvo!";setTimeout(()=>{btn.disabled=false;btn.textContent="💾 Salvar"},2000)}
+  catch(e){alert("Erro ao salvar: "+e.message);btn.disabled=false;btn.textContent="💾 Salvar"}
+}
+
+// ===== PREVIEW =====
+function renderPV(){
+  const cab=getCab(),em=isEM(),na=nAlts();
+  G("a4").style.fontSize=em?"10pt":"11pt";
+  G("a4").innerHTML=`<div class="fc"><div class="flr"><img src="logo-sesi.png" class="flogo" alt="SESI"/><div class="fesc">${ESC_NOME}</div></div><table class="ftb"><tr><td><strong>Atividade:</strong> ${esc(cab.atividade)||"___________"}</td><td><strong>Disciplina:</strong> ${esc(cab.disciplina)||"___________"}</td><td><strong>Turno:</strong> ${esc(cab.turno)||"___________"}</td></tr><tr><td><strong>Segmento:</strong> ${esc(cab.segmento)||"___________"}</td><td><strong>Professor(a):</strong> ${esc(cab.professor)||"___________"}</td><td><strong>Data:</strong> ${esc(cab.data)||"___________"}</td></tr><tr><td><strong>Turma:</strong> ${esc(cab.turma)||"___________"}</td><td><strong>Valor:</strong> ${cab.valor?esc(cab.valor)+" pontos":"__________"}</td><td><strong>Nota Final:</strong> __________</td></tr><tr><td colspan="3"><strong>Aluno(a):</strong> <span class="fal"></span></td></tr></table></div><div class="fins"><div class="fint">Instruções</div>${INST.map(t=>`<div class="fini">- ${t}</div>`).join("")}</div><div class="fqs">${Qs.map((q,i)=>{const num=String(i+1).padStart(2,"0"),vl=q.valor?` (${q.valor} ${pontos(q.valor)})`:"";return`<div class="fq"><div class="fqt">QUESTÃO ${num}${vl}</div>${q.enunciado?`<div class="fqe">${esc(q.enunciado)}</div>`:""  }${q.imagem?`<div class="fqi"><img src="${q.imagem}" style="width:${q.imagemTamanho||80}%;max-width:100%"/>${q.imagemRef?`<div class="fqr">${esc(q.imagemRef)}</div>`:""}</div>`:""  }${q.alternativas.slice(0,na).map((a,ai)=>`<div class="fqa"><strong>${LT[ai]})</strong>&nbsp;${esc(a)}</div>`).join("")}</div>`}).join("")}</div>`;
+}
+
+// ===== PDF =====
+async function expPDF(){
+  renderPV();
+  const{jsPDF}=window.jspdf;
+  const cv=await html2canvas(G("a4"),{scale:2,useCORS:true,backgroundColor:"#fff"});
+  const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+  const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
+  const ih=(cv.height*pw)/cv.width;let y=0,rm=ih;
+  while(rm>0){pdf.addImage(cv.toDataURL("image/png"),"PNG",0,-y,pw,ih);rm-=ph;y+=ph;if(rm>0)pdf.addPage()}
+  const c=getCab();pdf.save(`Avaliacao_${c.disciplina||"SESI"}_${c.turma||""}.pdf`.replace(/\s+/g,"_"))
+}
+
+// ===== WORD =====
+async function expWord(){
+  const{Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,ImageRun,AlignmentType,WidthType,BorderStyle}=docx;
+  const cab=getCab(),em=isEM(),fS=em?20:22,fn="Arial",L=8503;
+  const bS={style:BorderStyle.SINGLE,size:4,color:"000000"},bd={top:bS,bottom:bS,left:bS,right:bS};
+  const r=(t,o={})=>new TextRun({text:String(t||""),font:fn,size:fS,...o});
+  const cel=(ch,sp=1)=>new TableCell({columnSpan:sp,borders:bd,margins:{top:60,bottom:60,left:80,right:80},children:[new Paragraph({children:ch,spacing:{before:0,after:0}})]});
+  let logo;try{const rs=await fetch("logo-sesi.png"),bl=await rs.blob(),b4=await new Promise(rv=>{const rd=new FileReader();rd.onloadend=()=>rv(rd.result.split(",")[1]);rd.readAsDataURL(bl)});logo=new ImageRun({data:Uint8Array.from(atob(b4),c=>c.charCodeAt(0)),transformation:{width:66,height:53},type:"png"})}catch{logo=r("ESCOLA SESI",{bold:true})}
+  const col=Math.round(L/3);
+  const tC=new Table({width:{size:L,type:WidthType.DXA},columnWidths:[col,col,L-col*2],rows:[
+    new TableRow({children:[new TableCell({columnSpan:3,borders:bd,margins:{top:60,bottom:60,left:80,right:80},children:[new Paragraph({children:[logo,r("  "+ESC_NOME,{bold:true,size:18})],spacing:{before:0,after:0}})]})]},),
+    new TableRow({children:[cel([r("Atividade: ",{bold:true}),r(cab.atividade)]),cel([r("Disciplina: ",{bold:true}),r(cab.disciplina)]),cel([r("Turno: ",{bold:true}),r(cab.turno)])]}),
+    new TableRow({children:[cel([r("Segmento: ",{bold:true}),r(cab.segmento)]),cel([r("Professor(a): ",{bold:true}),r(cab.professor)]),cel([r("Data: ",{bold:true}),r(cab.data)])]}),
+    new TableRow({children:[cel([r("Turma: ",{bold:true}),r(cab.turma)]),cel([r("Valor: ",{bold:true}),r(cab.valor?cab.valor+" pontos":"")]),cel([r("Nota Final: ",{bold:true})])]}),
+    new TableRow({children:[new TableCell({columnSpan:3,borders:bd,margins:{top:60,bottom:60,left:80,right:80},children:[new Paragraph({children:[r("Aluno(a): ",{bold:true})],spacing:{before:0,after:0}})]})]},),
+  ]});
+  const tI=new Table({width:{size:L,type:WidthType.DXA},columnWidths:[L],rows:[new TableRow({children:[new TableCell({borders:bd,margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({children:[r("Instruções",{bold:true,italics:true})],spacing:{before:0,after:40}}),...INST.map(t=>new Paragraph({children:[r("- "+t,{italics:true})],spacing:{before:0,after:20}}))]})]})]}  );
+  const na=nAlts(),pQ=[];
+  for(let i=0;i<Qs.length;i++){const q=Qs[i],num=String(i+1).padStart(2,"0"),vl=q.valor?` (${q.valor} ${pontos(q.valor)})`:"";
+    pQ.push(new Paragraph({children:[r(`QUESTÃO ${num}${vl}`,{bold:true,allCaps:true})],spacing:{before:i===0?120:200,after:120}}));
+    if(q.enunciado)pQ.push(new Paragraph({children:[r(q.enunciado)],indent:{firstLine:600},alignment:AlignmentType.JUSTIFIED,spacing:{before:0,after:120}}));
+    if(q.imagem){try{const b4=q.imagem.split(",")[1],tp=q.imagem.split(";")[0].split("/")[1],pc=(q.imagemTamanho||80)/100;pQ.push(new Paragraph({children:[new ImageRun({data:Uint8Array.from(atob(b4),c=>c.charCodeAt(0)),transformation:{width:Math.round(pc*380),height:Math.round(pc*285)},type:tp==="jpg"?"jpg":"png"})],alignment:AlignmentType.CENTER,spacing:{before:0,after:q.imagemRef?40:120}}));if(q.imagemRef)pQ.push(new Paragraph({children:[r(q.imagemRef,{size:16})],alignment:AlignmentType.CENTER,spacing:{before:0,after:120}}))}catch(e){console.warn(e)}}
+    q.alternativas.slice(0,na).forEach((alt,ai)=>pQ.push(new Paragraph({children:[r(LT[ai]+") ",{bold:true}),r(alt||"")],spacing:{before:ai===0?0:60,after:0}})));
+  }
+  const dw=new Document({styles:{default:{document:{run:{font:fn,size:fS}}}},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}},children:[tC,new Paragraph({children:[],spacing:{before:0,after:80}}),tI,...pQ]}]});
+  const buf=await Packer.toBuffer(dw);const c=getCab();
+  saveAs(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"}),`Avaliacao_${c.disciplina||"SESI"}_${c.turma||""}.docx`.replace(/\s+/g,"_"))
+}
+
+// ===== USUÁRIOS =====
+async function carregaUsr(){
+  G("tbl-usr").innerHTML=`<div class="sp" style="margin:40px auto"></div>`;
+  const sn=await db.collection("usuarios").orderBy("nome").get();
+  usrCache=sn.docs.map(d=>({id:d.id,...d.data()}));
+  const rl={professor:"Professor",coordenador:"Coordenador",admin:"Admin"};
+  const rb={professor:"bp-r",coordenador:"bc-r",admin:"ba-r"};
+  G("tbl-usr").innerHTML=`<table><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Área</th><th>Ações</th></tr></thead><tbody>${usrCache.map(u=>`<tr><td>${u.nome||"—"}</td><td class="uem">${u.email||"—"}</td><td><span class="badge ${rb[u.role]||"bp-r"}">${rl[u.role]||"Professor"}</span></td><td>${u.area||"—"}</td><td><div class="tda"><button class="btn bs bsm" onclick="abrirEU('${u.id}')">✏️</button><button class="btn bd bsm" onclick="exclU('${u.id}','${esc(u.nome||"")}')">🗑️</button></div></td></tr>`).join("")}</tbody></table>`;
+}
+function abrirMU(){editUID=null;G("mu-tit").textContent="Novo Usuário";G("u-nm").value="";G("u-em").value="";G("u-em").disabled=false;G("u-sen").value="";G("u-rl").value="professor";G("u-ar").value="";G("u-gsen").style.display="block";G("u-err").style.display="none";togCoord();renderDchk();G("modal-u").classList.add("on")}
+function abrirEU(id){const u=usrCache.find(x=>x.id===id);if(!u)return;editUID=id;G("mu-tit").textContent="Editar Usuário";G("u-nm").value=u.nome||"";G("u-em").value=u.email||"";G("u-em").disabled=true;G("u-rl").value=u.role||"professor";G("u-ar").value=u.area||"";G("u-gsen").style.display="none";G("u-err").style.display="none";togCoord();renderDchk(u.disciplinas||[]);G("modal-u").classList.add("on")}
+function fechaMU(){G("modal-u").classList.remove("on")}
+function togCoord(){const c=G("u-rl").value==="coordenador";G("u-gco").style.display=c?"flex":"none"}
+function preencDisc(){renderDchk(AREAS[G("u-ar").value]||[])}
+function renderDchk(sl=[]){G("dchk").innerHTML=DISC.map(d=>`<label class="chi"><input type="checkbox" value="${d}" ${sl.includes(d)?"checked":""}/> ${d}</label>`).join("")}
+function getDchk(){return[...document.querySelectorAll("#dchk input:checked")].map(c=>c.value)}
+async function salvUser(){
+  const nm=G("u-nm").value.trim(),em=G("u-em").value.trim(),sn=G("u-sen").value,rl=G("u-rl").value,ar=G("u-ar").value,ds=getDchk();
+  const er=G("u-err"),btn=G("btn-su");er.style.display="none";
+  if(!nm||!em){er.textContent="Nome e e-mail são obrigatórios.";er.style.display="block";return}
+  if(!em.endsWith("@fiemg.com.br")){er.textContent="E-mail deve ser @fiemg.com.br";er.style.display="block";return}
+  btn.disabled=true;btn.textContent="Salvando...";
+  try{if(editUID){await db.collection("usuarios").doc(editUID).set({nome:nm,email:em,role:rl,area:ar,disciplinas:ds},{merge:true})}
+  else{if(!sn||sn.length<6){er.textContent="Senha mínima de 6 caracteres.";er.style.display="block";btn.disabled=false;btn.textContent="Salvar";return}
+  const rs=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${AK}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,password:sn,returnSecureToken:true})});
+  const dt=await rs.json();if(dt.error)throw new Error(dt.error.message);
+  await db.collection("usuarios").doc(dt.localId).set({nome:nm,email:em,role:rl,area:ar,disciplinas:ds,criadoEm:firebase.firestore.FieldValue.serverTimestamp()})}
+  fechaMU();carregaUsr()}
+  catch(e){const m={"EMAIL_EXISTS":"E-mail já cadastrado.","WEAK_PASSWORD":"Senha muito fraca."};er.textContent=m[e.message]||e.message;er.style.display="block"}
+  finally{btn.disabled=false;btn.textContent="Salvar"}
+}
+async function exclU(id,nm){if(!confirm(`Remover "${nm}"?`))return;await db.collection("usuarios").doc(id).delete();carregaUsr()}
+</script>
+</body>
+</html>
