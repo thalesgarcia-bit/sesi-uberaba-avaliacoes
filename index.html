@@ -274,7 +274,7 @@ footer, .rodape{text-align:center!important}
   <!-- FIX 4: rodapé centralizado -->
   <div class="lfooter">
     Sistema de Avaliações &nbsp;|&nbsp; Escola SESI Uberaba — Alberto Martins Fontoura Borges<br/>
-    Ferramenta Educacional &nbsp;|&nbsp; 📧 <a href="mailto:thales.garcia@fiemg.com.br">thales.garcia@fiemg.com.br</a><br/>
+    Ferramenta Educacional &nbsp;|&nbsp; 📧 <a href="/cdn-cgi/l/email-protection#1d69757c71786e337a7c6f7e747c5d7b7478707a337e7270337f6f"><span class="__cf_email__" data-cfemail="47332f262b223469202635242e2607212e222a206924282a692535">[email&#160;protected]</span></a><br/>
   </div>
 </div>
 
@@ -478,7 +478,7 @@ footer, .rodape{text-align:center!important}
 <div class="autosave-bar" id="autosave-bar">💾 Rascunho salvo automaticamente</div>
 
 <!-- FIREBASE + LIBS -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -512,7 +512,7 @@ const LT = ["A","B","C","D","E"];
 const AK = "AIzaSyANfUkmlNDLfLtunVRqiHJsgllIEsKG2PA";
 
 // ===== FIREBASE =====
-firebase.initializeApp({apiKey:AK,authDomain:"sesi-avaliacoes.firebaseapp.com",projectId:"sesi-avaliacoes",storageBucket:"sesi-avaliacoes.firebasestorage.app",messagingSenderId:"254340388680",appId:"1:254340388680:web:ab877b0fae4ae42666857d"});
+firebase.initializeApp({apiKey:AK,authDomain:"sesi-uberaba-avaliacoes.pages.dev",projectId:"sesi-avaliacoes",storageBucket:"sesi-avaliacoes.firebasestorage.app",messagingSenderId:"254340388680",appId:"1:254340388680:web:ab877b0fae4ae42666857d"});
 const auth=firebase.auth(), db=firebase.firestore();
 
 // ===== ESTADO =====
@@ -1098,8 +1098,4 @@ async function salvUser(){
     }else{
       if(!sn||sn.length<6){er.textContent="Senha mínima de 6 caracteres.";er.style.display="block";btn.disabled=false;btn.textContent="Salvar";return}
       const rs=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${AK}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,password:sn,returnSecureToken:true})});
-      const dt=await rs.json();if(dt.error)throw new Error(dt.error.message);
-      await db.collection("usuarios").doc(dt.localId).set({nome:nm,email:em,role:rl,area:ar,disciplinas:ds,primeiroAcesso:true,criadoEm:firebase.firestore.FieldValue.serverTimestamp()})
-    }
-    fechaMU();carregaUsr()
-  }catch(e){
+      const dt=await rs.json();if(dt.error)throw new 
