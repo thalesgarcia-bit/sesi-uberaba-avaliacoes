@@ -51,7 +51,7 @@ input,select,textarea{font-family:inherit;outline:none}
 /* LOGIN */
 #pg-login{min-height:100vh;background:linear-gradient(135deg,#1a3a6b 0%,#1e4d9b 60%,#2563c7 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 24px 80px;text-align:center}
 .lcard{background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:44px 40px 36px;width:100%;max-width:420px;text-align:center;margin:0 auto}
-.llogo{width:210px;max-width:70%;height:auto;margin:0 auto 18px;display:block}
+.llogo{width:180px;max-width:62%;height:auto;margin:0 auto 18px;display:block;background:transparent}
 .lesc{font-size:.72rem;font-weight:700;color:var(--azul);letter-spacing:.05em;text-transform:uppercase;margin-bottom:22px;line-height:1.4}
 .ltit{font-size:1.7rem;font-weight:800;color:var(--azul);margin-bottom:4px}
 .lsub{font-size:.83rem;color:var(--cinza-e);margin-bottom:28px;line-height:1.4}
@@ -69,7 +69,7 @@ input,select,textarea{font-family:inherit;outline:none}
 .sidebar{width:240px;min-height:100vh;background:linear-gradient(180deg,#1a3a6b 0%,#1e4d9b 100%);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s}
 .sbh{padding:28px 20px 20px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;gap:10px}
 /* FIX 2: Logo atualizada no sidebar — destaque maior e texto correto */
-.sblogo{width:94px;height:auto;object-fit:contain;background:transparent;padding:0}
+.sblogo{width:92px;height:auto;object-fit:contain;background:transparent;padding:0;display:block;margin:0 auto}
 .sbsch{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.06em;text-align:center;line-height:1.4}
 .sbnav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:4px}
 .sblnk{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,.75);font-size:.9rem;font-weight:500;transition:all .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
@@ -85,7 +85,7 @@ input,select,textarea{font-family:inherit;outline:none}
 
 /* MOBILE */
 .mbar{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:var(--azul);align-items:center;justify-content:space-between;padding:0 16px;z-index:200}
-.mlogo{width:64px;height:auto;object-fit:contain}
+.mlogo{width:74px;height:auto;object-fit:contain;background:transparent}
 .hbg{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
 .sbo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
 
@@ -222,8 +222,8 @@ footer, .rodape{text-align:center!important}
 .sobre-title{font-size:2rem;font-weight:800;color:var(--azul);margin-bottom:18px;font-family:Inter,sans-serif}
 .sobre-text{font-size:1.03rem;line-height:1.9;color:#24324a;margin-bottom:14px;text-align:justify}
 .sobre-divider{height:1px;background:#e5e7eb;margin:20px 0}
-.sobre-pessoas{display:flex;flex-direction:column;gap:18px}
-.sobre-pessoa{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 0;border-bottom:1px solid #eef2f7;text-align:center}
+.sobre-pessoas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.sobre-pessoa{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 0;text-align:center;background:#fbfcfe;border:1px solid #eef2f7;border-radius:18px}
 .sobre-pessoa:last-child{border-bottom:none}
 .sobre-foto{width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid #eef2f7;flex-shrink:0}
 .sobre-nome{font-size:1.15rem;font-weight:700;color:#10233f}
@@ -234,7 +234,7 @@ footer, .rodape{text-align:center!important}
   .sbo.on{display:block}.mbar{display:flex}
   .mc{margin-left:0;margin-top:56px;padding:20px 16px}
 }
-@media(max-width:480px){.lcard{padding:32px 20px 26px}}
+@media(max-width:800px){.sobre-pessoas{grid-template-columns:1fr}}@media(max-width:480px){.lcard{padding:32px 20px 26px}}
 </style>
 </head>
 <body>
@@ -582,12 +582,13 @@ function resetLoginUI(){
   if(G("btn-login")){G("btn-login").disabled=false;G("btn-login").textContent="Entrar"}
   if(G("lin-senha"))G("lin-senha").value="";
 }
-async function sairSistema(){
+async async function sairSistema(){
   resetLoginUI();
   try{await auth.signOut();}catch(e){console.error(e)}
+  if(G("lin-senha")) G("lin-senha").value="";
   pgShow("pg-login");
 }
-function vwShow(v){["vw-about","vw-dash","vw-ed","vw-usr","vw-cfg","vw-envios"].forEach(x=>{const el=G(x);if(el)el.style.display=x===`vw-${v}`?"block":"none"});vwAtual=v;sideHL()}
+function vwShow(v){["vw-about","vw-dash","vw-ed","vw-usr","vw-org","vw-cfg","vw-envios"].forEach(x=>{const el=G(x);if(el)el.style.display=x===`vw-${v}`?"block":"none"});vwAtual=v;sideHL()}
 function sideHL(){document.querySelectorAll(".sblnk").forEach(l=>l.classList.toggle("on",l.dataset.v===vwAtual))}
 const isEM=()=>G("cab-sgm")?.value==="Ensino Médio";
 const isAF=()=>G("cab-sgm")?.value==="Ensino Fundamental Anos Finais";
@@ -600,36 +601,25 @@ function gerarNomeAuto(){
   const atv=G("cab-atv")?.value||"";
   const trm=G("cab-trm")?.value||"";
   const dsc=G("cab-dsc")?.value||"";
-  const sgm=G("cab-sgm")?.value||"";
   if(!atv||!trm||!dsc){if(G("cab-nome-auto"))G("cab-nome-auto").value="";return}
-  // Mapear atividade para código
+  const norm=s=>String(s||"").toUpperCase().replace(/\s+/g,"").replace(/[ÇçÃãÁáÀàÂâÉéÊêÍíÓóÔôÚúÜü]/g,c=>({"Ç":"C","ç":"C","Ã":"A","ã":"A","Á":"A","á":"A","À":"A","à":"A","Â":"A","â":"A","É":"E","é":"E","Ê":"E","ê":"E","Í":"I","í":"I","Ó":"O","ó":"O","Ô":"O","ô":"O","Ú":"U","ú":"U","Ü":"U","ü":"U"}[c]||c));
   const ativCod={
-    "Avaliação 1ª Etapa Letiva":"AVALIACAOSOMATIVA","Avaliação 2ª Etapa Letiva":"AVALIACAOSOMATIVA",
-    "Avaliação 3ª Etapa Letiva":"AVALIACAOSOMATIVA","Autoavaliação":"AUTOAVALIACAO",
-    "Avaliação de Recuperação 1ª Etapa Letiva":"AVALIACAORECUPERACAO","Avaliação de Recuperação 2ª Etapa Letiva":"AVALIACAORECUPERACAO",
-    "Avaliação de Recuperação Final":"AVALIACAORECUPERACAOFINAL","Trabalho Avaliativo":"TRABALHOAVALIATIVO",
-    "Trabalho Interdisciplinar":"TRABALHOINTERDISCIPLINAR","Relatório":"RELATORIO","Seminário":"SEMINARIO",
-    "Simulado Interno 1ª Etapa Letiva":"SIMULADO","Simulado Interno 2ª Etapa Letiva":"SIMULADO","Simulado Interno 3ª Etapa Letiva":"SIMULADO"
+    "Avaliação 1ª Etapa Letiva":"AVALIACAOSOMATIVA","Avaliação 2ª Etapa Letiva":"AVALIACAOSOMATIVA","Avaliação 3ª Etapa Letiva":"AVALIACAOSOMATIVA",
+    "Autoavaliação":"AUTOAVALIACAO","Avaliação de Recuperação 1ª Etapa Letiva":"AVALIACAORECUPERACAO","Avaliação de Recuperação 2ª Etapa Letiva":"AVALIACAORECUPERACAO",
+    "Avaliação de Recuperação Final":"AVALIACAORECUPERACAOFINAL","Trabalho Avaliativo":"TRABALHOAVALIATIVO","Trabalho Interdisciplinar":"TRABALHOINTERDISCIPLINAR",
+    "Relatório":"RELATORIO","Seminário":"SEMINARIO","Simulado Interno 1ª Etapa Letiva":"SIMULADO","Simulado Interno 2ª Etapa Letiva":"SIMULADO","Simulado Interno 3ª Etapa Letiva":"SIMULADO"
   };
-  const etapaCod={
-    "1ª Etapa Letiva":"1ETAPA","2ª Etapa Letiva":"2ETAPA","3ª Etapa Letiva":"3ETAPA",
-    "Recuperação 1ª Etapa Letiva":"REC1ETAPA","Recuperação 2ª Etapa Letiva":"REC2ETAPA","Recuperação Final":"RECFINAL"
-  };
-  let cod=ativCod[atv]||atv.toUpperCase().replace(/\s+/g,"").replace(/[ÇçÃãÁáÀàÂâÉéÊêÍíÓóÔôÚú]/g,c=>({"Ç":"C","ç":"C","Ã":"A","ã":"A","Á":"A","á":"A","À":"A","à":"A","Â":"A","â":"A","É":"E","é":"E","Ê":"E","ê":"E","Í":"I","í":"I","Ó":"O","ó":"O","Ô":"O","ô":"O","Ú":"U","ú":"U"}[c]||c));
-  // Detectar etapa na atividade
   let etapa="";
-  for(const[k,v] of Object.entries(etapaCod)){if(atv.includes(k)){etapa=v;break}}
-  // Turma: extrair apenas a parte relevante (ex: 7ANOA de EF-7A-M-12210-2026)
-  let turmaCod=trm.replace("EF-","").replace(/-M-\d+-\d+/,"").replace(/-T-\d+-\d+/,"").toUpperCase();
-  turmaCod=turmaCod+"A"; // adicionar sufixo de turma (EF-7A -> 7AA, simplificar)
-  // Usar a turma exata simplificada
-  turmaCod=trm.replace(/EF-/,"").replace(/-[MTm]-\d+-\d+/,"").replace(/-/,"").toUpperCase();
-  // Disciplina sem espaços e sem acentos
-  const discCod=dsc.replace(/\s+/g,"").replace(/[ÇçÃãÁáÀàÂâÉéÊêÍíÓóÔôÚúÜü]/g,c=>({"Ç":"C","ç":"C","Ã":"A","ã":"A","Á":"A","á":"A","À":"A","à":"A","Â":"A","â":"A","É":"E","é":"E","Ê":"E","ê":"E","Í":"I","í":"I","Ó":"O","ó":"O","Ô":"O","ô":"O","Ú":"U","ú":"U"}[c]||c));
-  let nome=cod;
-  if(turmaCod)nome+="-"+turmaCod;
-  if(etapa)nome+="-"+etapa;
-  if(discCod)nome+="-"+discCod;
+  if(atv.includes("1ª Etapa")) etapa="1ETAPA";
+  else if(atv.includes("2ª Etapa")) etapa="2ETAPA";
+  else if(atv.includes("3ª Etapa")) etapa="3ETAPA";
+  else if(atv.includes("Recuperação Final")) etapa="RECFINAL";
+  const tm = trm.match(/^EF-(\d+)([A-Z]?)-/i);
+  let turmaCod="";
+  if(tm){ turmaCod = `${tm[1]}ANO${(tm[2]||"").toUpperCase()}`; }
+  else { turmaCod = norm(trm); }
+  const discCod = norm(dsc);
+  const nome = [ativCod[atv]||norm(atv), turmaCod, etapa, discCod, "2026"].filter(Boolean).join("-");
   if(G("cab-nome-auto"))G("cab-nome-auto").value=nome;
 }
 
@@ -675,7 +665,7 @@ auth.onAuthStateChanged(async user=>{
 
 G("form-login").addEventListener("submit",async e=>{
   e.preventDefault();
-  const em=G("lin-email").value.trim(), sn=G("lin-senha").value;
+  const em=G("lin-email").value.trim().toLowerCase(), sn=G("lin-senha").value;
   const btn=G("btn-login"), er=G("lin-erro");
   er.style.display="none";
   if(!em.endsWith("@fiemg.com.br")){er.textContent="Utilize seu e-mail institucional (@fiemg.com.br).";er.style.display="block";return}
@@ -683,7 +673,7 @@ G("form-login").addEventListener("submit",async e=>{
   else{localStorage.removeItem("sesi_email");localStorage.removeItem("sesi_senha");localStorage.removeItem("sesi_lembrar")}
   btn.disabled=true;btn.textContent="Entrando...";
   try{await auth.signInWithEmailAndPassword(em,sn)}
-  catch(err){const m={"auth/invalid-credential":"E-mail ou senha incorretos.","auth/user-not-found":"Usuário não encontrado.","auth/wrong-password":"Senha incorreta.","auth/too-many-requests":"Muitas tentativas. Tente mais tarde.","auth/invalid-email":"E-mail inválido.","auth/user-disabled":"Usuário desativado. Contate o administrador.","auth/network-request-failed":"Erro de rede. Verifique sua conexão."};er.textContent=m[err.code]||("Erro: "+err.code+" — "+err.message);er.style.display="block";btn.disabled=false;btn.textContent="Entrar"}
+  catch(err){const m={"auth/invalid-credential":"E-mail ou senha incorretos.","auth/user-not-found":"Usuário não encontrado.","auth/wrong-password":"Senha incorreta.","auth/too-many-requests":"Muitas tentativas. Tente mais tarde.","auth/invalid-email":"E-mail inválido.","auth/user-disabled":"Usuário desativado. Contate o administrador.","auth/network-request-failed":"Erro de rede. Verifique sua conexão.","auth/invalid-login-credentials":"E-mail ou senha incorretos."};er.textContent=m[err.code]||("Erro: "+err.code+" — "+err.message);er.style.display="block";btn.disabled=false;btn.textContent="Entrar"}
 });
 
 // ===== SIDEBAR — FIX 6: controle de acesso por perfil =====
@@ -704,13 +694,15 @@ function buildSide(){
       {v:"about",i:"ℹ️",t:"Sobre"},
       {v:"dash",i:"🏠",t:"Painel"},
       {v:"nova",i:"✏️",t:"Nova Avaliação"},
-      {v:"usr",i:"👥",t:"Usuários"}
+      {v:"usr",i:"👥",t:"Usuários"},
+      {v:"org",i:"🗂️",t:"Organograma"}
     ],
     admin:[
       {v:"about",i:"ℹ️",t:"Sobre"},
       {v:"dash",i:"🏠",t:"Painel"},
       {v:"nova",i:"✏️",t:"Nova Avaliação"},
       {v:"usr",i:"👥",t:"Usuários"},
+      {v:"org",i:"🗂️",t:"Organograma"},
       {v:"cfg",i:"⚙️",t:"Configurações"}
     ]
   };
@@ -731,6 +723,7 @@ function navTo(v){
   if(v==="about"){vwShow("about");return}
   if(v==="nova"){novoEd();return}
   if(v==="usr"){vwShow("usr");carregaUsr();return}
+  if(v==="org"){vwShow("org");carregaOrg();return}
   if(v==="cfg"){
     if((UD.role||"professor")==="admin"){vwShow("cfg");preencherFormCfg();return}
     else{alert("Acesso restrito ao Administrador.");return}
@@ -819,7 +812,7 @@ function novoEd(){
   G("ed-tit").textContent="Nova Avaliação";
   G("btn-sv").style.display="";
   initSels();
-  G("cab-dat").placeholder="__/__/2026";G("cab-dat").value=new Date().toLocaleDateString("pt-BR").replace(/\/\d{4}$/,"/2026");aplicarMascaraData();
+  G("cab-dat").placeholder="__/__/2026";G("cab-dat").value="";aplicarMascaraData();
   if(UD.nome)G("cab-prf").value=UD.nome;
   Qs=[novaQ()];renderQ();mudaAba("ed");
   // FIX 16: carregar rascunho do localStorage se houver
@@ -840,20 +833,20 @@ async function abrirEd(id,soVer=false,aba="ed"){
 function initSels(){
   sel("cab-atv",ATIV);
   sel("cab-dsc",DISC);
-  // FIX 8: garantir apenas um Matutino
-  sel("cab-trn",[...new Set(TURN)],"Matutino");
-  G("cab-trn").value="Matutino";
-  sel("cab-sgm",SEGS);
-  atuSeg();
+  sel("cab-trn",[...new Set((TURN||[]).map(t=>String(t).trim()))].filter(Boolean),"Escolher um item.");
+  sel("cab-sgm",SEGS,"Escolher um item.");
+  sel("cab-trm",[],"Selecione o segmento primeiro.");
 }
 
 // FIX 9: ao mudar segmento, filtrar turmas corretamente
 function atuSeg(){
-  let turmas;
+  const seg=G("cab-sgm")?.value||"";
+  let turmas=[];
+  if(!seg){sel("cab-trm",[],"Selecione o segmento primeiro."); renderQ(); gerarNomeAuto(); return;}
   if(isAF()) turmas=TURM_AF;
   else if(isEM()) turmas=TURM_EM;
-  else turmas=TURM_AI;
-  sel("cab-trm",turmas);
+  else if(isAI()) turmas=TURM_AI;
+  sel("cab-trm",turmas,"Escolher um item.");
   const n=nAlts();
   Qs=Qs.map(q=>{const a=[...q.alternativas];while(a.length<n)a.push("");return{...q,alternativas:a.slice(0,n)}});
   G("ed-sub").textContent=`Fonte Arial ${isEM()?10:11}pt · ${isEM()?"Ensino Médio (A–E)":"Ensino Fundamental (A–D)"}`;
@@ -1117,7 +1110,7 @@ async function expWord(){
   .a4-page,.a4{background:#fff}
   </style></head><body>${conteudo}</body></html>`;
   const blob=new Blob(['\ufeff',html],{type:'application/msword'});
-  saveAs(blob, `${nome}.doc`);
+  saveAs(blob, `${nome}.docx`);
 }
 
 // ===== TROCA DE SENHA — FIX 5 =====
@@ -1146,12 +1139,12 @@ async function confirmarTroca(){
 // ===== USUÁRIOS =====
 async function carregaUsr(){
   G("tbl-usr").innerHTML=`<div class="sp" style="margin:40px auto"></div>`;
-  const sn=await db.collection("usuarios").orderBy("nome").get();
-  usrCache=sn.docs.map(d=>({id:d.id,...d.data()}));
+  const sn=await db.collection("usuarios").get();
+  usrCache=sn.docs.map(d=>({id:d.id,...d.data(),nome:(d.data().nome||d.data().name||d.data().email||"—"),role:(d.data().role||d.data().type||"professor")}))
+    .sort((a,b)=>String(a.nome).localeCompare(String(b.nome),'pt-BR'));
   const rl={professor:"Professor",coordenador:"Coordenador",admin:"Admin"};
   const rb={professor:"bp-r",coordenador:"bc-r",admin:"ba-r"};
   const role=UD.role||"professor";
-  // FIX 6: coordenador não vê/edita outros admins
   const lista=role==="coordenador"?usrCache.filter(u=>u.role!=="admin"):usrCache;
   G("tbl-usr").innerHTML=`<table><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Área</th><th>Ações</th></tr></thead><tbody>${lista.map(u=>`<tr><td>${u.nome||"—"}</td><td class="uem">${u.email||"—"}</td><td><span class="badge ${rb[u.role]||"bp-r"}">${rl[u.role]||"Professor"}</span></td><td>${u.area||"—"}</td><td><div class="tda"><button class="btn bs bsm" onclick="abrirEU('${u.id}')">✏️</button>${role==="admin"?`<button class="btn bd bsm" onclick="exclU('${u.id}','${esc(u.nome||"")}')">🗑️</button>`:"" }</div></td></tr>`).join("")}</tbody></table>`;
 }
@@ -1177,7 +1170,7 @@ function abrirEU(id){
 }
 
 function fechaMU(){G("modal-u").classList.remove("on")}
-function togCoord(){const c=G("u-rl").value==="coordenador";G("u-gco").style.display=c?"flex":"none"}
+function togCoord(){const rl=G("u-rl").value;const c=(rl==="coordenador"||rl==="professor");G("u-gco").style.display=c?"flex":"none"}
 function preencDisc(){renderDchk(AREAS[G("u-ar").value]||[])}
 function renderDchk(sl=[]){G("dchk").innerHTML=DISC.map(d=>`<label class="chi"><input type="checkbox" value="${d}" ${sl.includes(d)?"checked":""}/> ${d}</label>`).join("")}
 function getDchk(){return[...document.querySelectorAll("#dchk input:checked")].map(c=>c.value)}
@@ -1192,7 +1185,7 @@ async function salvUser(){
   btn.disabled=true;btn.textContent="Salvando...";
   try{
     if(editUID){
-      await db.collection("usuarios").doc(editUID).set({nome:nm,email:em,role:rl,area:ar,disciplinas:ds},{merge:true})
+      await db.collection("usuarios").doc(editUID).set({nome:nm,email:em,role:rl,area:ar,disciplinas:ds,status:"ativo"},{merge:true})
     }else{
       if(!sn||sn.length<6){er.textContent="Senha mínima de 6 caracteres.";er.style.display="block";btn.disabled=false;btn.textContent="Salvar";return}
       const rs=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${AK}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,password:sn,returnSecureToken:true})});
@@ -1250,7 +1243,7 @@ function aplicarCfgSalva(){
     ESC_NOME=c.escola||ESC_NOME;
     ATIV=(c.ativ||ATIV).filter(Boolean);
     DISC=(c.disc||DISC).filter(Boolean);
-    TURN=(c.turn||TURN).filter(Boolean);
+    TURN=[...new Set((c.turn||TURN).map(s=>String(s).trim()).filter(Boolean))];
     SEGS=(c.segs||SEGS).filter(Boolean);
     TURM_AI=(c.turmAI||TURM_AI).filter(Boolean);
     TURM_AF=(c.turmAF||TURM_AF).filter(Boolean);
@@ -1274,11 +1267,36 @@ function salvarCfg(){
   };
   localStorage.setItem("sesi_cfg",JSON.stringify(cfg));
   ESC_NOME=cfg.escola; ATIV=cfg.ativ; DISC=cfg.disc; TURN=cfg.turn; SEGS=cfg.segs; TURM_AI=cfg.turmAI; TURM_AF=cfg.turmAF; TURM_EM=cfg.turmEM; INST=cfg.inst;
-  alert("Configurações salvas. Reabra a avaliação para atualizar os seletores.");
+  try{preencherFormCfg(); if(vwAtual==="ed") initSels();}catch(e){console.error(e)}
+  alert("Configurações salvas.");
 }
 function resetarCfg(){
   localStorage.removeItem("sesi_cfg");
   location.reload();
+}
+
+
+async function carregaOrg(){
+  const wrap=G("org-wrap");
+  if(!wrap) return;
+  wrap.innerHTML='<div class="sp" style="margin:30px auto"></div>';
+  try{
+    const sn=await db.collection("usuarios").get();
+    const users=sn.docs.map(d=>({id:d.id,...d.data(),nome:d.data().nome||d.data().name||d.data().email||"Sem nome",role:d.data().role||d.data().type||"professor"}));
+    const areas=["Pedagógico","Linguagens","Exatas","Humanas","Saúde e Expressão"];
+    const html=areas.map(area=>{
+      const coords=users.filter(u=>(u.area||"")==area && u.role==="coordenador");
+      const profs=users.filter(u=>(u.area||"")==area && u.role==="professor");
+      return `<div class="card" style="margin-bottom:14px"><div class="stit" style="margin-bottom:10px;border:none;padding:0">${area}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div><div style="font-weight:700;margin-bottom:8px;color:var(--azul)">Coordenação de Área</div>${coords.length?coords.map(u=>`<div style="padding:6px 0">${u.nome}</div>`).join(""):'<div style="color:var(--cinza-e)">Nenhum coordenador alocado.</div>'}</div>
+          <div><div style="font-weight:700;margin-bottom:8px;color:var(--azul)">Professores</div>${profs.length?profs.map(u=>`<div style="padding:6px 0">${u.nome}</div>`).join(""):'<div style="color:var(--cinza-e)">Nenhum professor alocado.</div>'}</div>
+        </div></div>`;
+    }).join("");
+    wrap.innerHTML=html;
+  }catch(e){
+    wrap.innerHTML='<div class="ae">Erro ao carregar organograma.</div>';
+  }
 }
 
 async function enviarParaCoordenador(id){
