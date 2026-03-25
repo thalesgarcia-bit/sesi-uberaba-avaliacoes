@@ -545,18 +545,17 @@ function gerarNomeAuto(){
 
 // ===== AUTH =====
 auth.onAuthStateChanged(async user=>{
-  try{
-    if(!user){pgShow("pg-login");return}
-    CU=user;
-    const sn=await db.collection("usuarios").doc(user.uid).get();
-    if(!sn.exists){
+  if(!user){pgShow("pg-login");return}
+  CU=user;
+  const sn=await db.collection("usuarios").doc(user.uid).get();
+  if(!sn.exists){
     // Tentar buscar por e-mail se o doc não existir pelo UID
     const byEmail=await db.collection("usuarios").where("email","==",user.email).limit(1).get();
     if(!byEmail.empty){
       UD=byEmail.docs[0].data();
     } else {
       // Fallback: criar perfil padrão baseado no e-mail
-      UD={role:"professor",nome:user.email,email:user.email,primeiroAcesso:false,status:"ativo"};
+      UD={role:"professor",nome:user.email,email:user.email,primeiroAcesso:false};
       if(user.email==="admin@fiemg.com.br"||user.email==="thales.garcia@fiemg.com.br"){
         UD.role="admin";UD.nome=user.email==="thales.garcia@fiemg.com.br"?"Thales Garcia":"Administrador";
       }
@@ -576,12 +575,6 @@ auth.onAuthStateChanged(async user=>{
   buildSide();
   irDash();
   iniciarAutoSave();
-  }catch(e){
-    console.error(e);
-    alert("Erro ao carregar seu perfil: "+(e.message||e));
-    try{await auth.signOut();}catch(_){}
-    pgShow("pg-login");
-  }
 });
 
 // ===== LOGIN =====
@@ -1078,4 +1071,54 @@ async function salvUser(){
     }else{
       if(!sn||sn.length<6){er.textContent="Senha mínima de 6 caracteres.";er.style.display="block";btn.disabled=false;btn.textContent="Salvar";return}
       const rs=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${AK}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,password:sn,returnSecureToken:true})});
-      const dt=await rs.json();if(dt.error)throw new 
+      
+Error(dt.error.message||"Falha ao criar usuário");
+      await db.collection("usuarios").doc(dt.localId).set({
+        nome:nm,
+        email:em,
+        role:rl,
+        area:ar,
+        disciplinas:ds,
+        primeiroAcesso:true,
+        status:"ativo"
+      },{merge:true});
+    }
+    fechaMU();
+    await carregaUsr();
+  }catch(e){
+    er.textContent=(e.message||e);
+    er.style.display="block";
+  }finally{
+    btn.disabled=false;
+    btn.textContent="Salvar";
+  }
+}
+
+async function exclU(id,nome){
+  if(!confirm(`Excluir usuário "${nome}"?`)) return;
+  try{
+    await db.collection("usuarios").doc(id).delete();
+    await carregaUsr();
+  }catch(e){
+    alert("Erro ao excluir usuário: "+(e.message||e));
+  }
+}
+
+function salvarCfg(){
+  alert("Configurações salvas.");
+}
+
+async function enviarParaCoordenador(id){
+  try{
+    await db.collection("avaliacoes").doc(id).set({
+      enviadoParaCoordenacao:true,
+      enviadoEm: new Date().toISOString()
+    },{merge:true});
+    alert("Avaliação enviada ao coordenador.");
+  }catch(e){
+    alert("Erro ao enviar: "+(e.message||e));
+  }
+}
+</script>
+</body>
+</html>
