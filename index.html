@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SESI Avaliações</title>
+<title>SESI Avaliações V2</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -15,8 +15,6 @@ body{font-family:Arial;background:#f5f6fa;margin:0;padding:40px}
 input{width:100%;padding:10px;margin:8px 0}
 button{padding:10px 16px;background:#1a3a6b;color:white;border:none;border-radius:4px;cursor:pointer}
 .admin{display:none}
-.item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #ddd}
-.actions{display:flex;gap:8px}
 </style>
 </head>
 <body>
@@ -25,7 +23,7 @@ button{padding:10px 16px;background:#1a3a6b;color:white;border:none;border-radiu
   <h2>Login</h2>
   <input id="email" placeholder="email institucional">
   <input id="senha" type="password" placeholder="senha">
-  <button id="btnEntrar" type="button">Entrar</button>
+  <button id="btnEntrar">Entrar</button>
 </div>
 
 <div class="container admin" id="adminBox">
@@ -45,85 +43,63 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 document.getElementById("btnEntrar").addEventListener("click", login);
 
-async function login() {
-  const email = document.getElementById("email").value.trim();
+async function login(){
+  const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
 
-  if (!email.endsWith("@fiemg.com.br")) {
-    alert("Use seu email institucional.");
+  if(!email.endsWith("@fiemg.com.br")){
+    alert("Use email institucional");
     return;
   }
 
-  try {
+  try{
     const cred = await auth.signInWithEmailAndPassword(email, senha);
     const uid = cred.user.uid;
+
     const doc = await db.collection("usuarios").doc(uid).get();
 
-    if (!doc.exists) {
-      alert("Usuário não autorizado.");
-      await auth.signOut();
+    if(!doc.exists){
+      alert("Usuário não autorizado");
       return;
     }
 
     const data = doc.data();
 
-    if (data.role === "admin") {
-      await abrirAdmin();
-    } else {
-      alert("Login realizado, mas esta V1 está mostrando apenas o painel admin.");
+    if(data.role==="admin"){
+      abrirAdmin();
     }
-  } catch (e) {
+
+  }catch(e){
     alert(e.message);
-    console.error(e);
   }
 }
 
-async function abrirAdmin() {
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("adminBox").style.display = "block";
+async function abrirAdmin(){
+  document.getElementById("loginBox").style.display="none";
+  document.getElementById("adminBox").style.display="block";
 
-  const snap = await db.collection("usuarios").where("status", "==", "pendente").get();
+  const snap = await db.collection("usuarios").where("status","==","pendente").get();
   const box = document.getElementById("pendentes");
-  box.innerHTML = "";
+  box.innerHTML="";
 
-  if (snap.empty) {
-    box.innerHTML = "<p>Nenhuma solicitação pendente.</p>";
+  if(snap.empty){
+    box.innerHTML="Nenhuma solicitação pendente.";
     return;
   }
 
-  snap.forEach((doc) => {
+  snap.forEach(doc=>{
     const d = doc.data();
     const div = document.createElement("div");
-    div.className = "item";
-
-    const info = document.createElement("div");
-    info.textContent = d.email || doc.id;
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-
-    const btn = document.createElement("button");
-    btn.textContent = "Aprovar";
-    btn.addEventListener("click", () => aprovar(doc.id));
-
-    actions.appendChild(btn);
-    div.appendChild(info);
-    div.appendChild(actions);
+    div.innerHTML = d.email;
     box.appendChild(div);
   });
 }
-
-async function aprovar(id) {
-  await db.collection("usuarios").doc(id).update({ status: "ativo" });
-  alert("Usuário aprovado");
-  await abrirAdmin();
-}
 </script>
+
 </body>
 </html>
