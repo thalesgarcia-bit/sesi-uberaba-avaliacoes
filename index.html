@@ -2,41 +2,94 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>SESI Editor Final v1</title>
+<title>SESI Modelo Pronto</title>
 <style>
-body{font-family:Arial;margin:0;padding:20px;background:#f5f5f5}
-.toolbar{background:#fff;padding:10px;border:1px solid #ccc;margin-bottom:10px}
-.editor{background:#fff;padding:20px;border:1px solid #ccc;min-height:500px}
+body{margin:0;background:#eaeaea;font-family:Arial}
+.page{width:210mm;min-height:297mm;margin:20px auto;background:#fff;padding:12mm;box-sizing:border-box}
+.topbar{height:50px;background:#0B3D91;margin:-12mm -12mm 10px -12mm}
+.logo{text-align:center;margin:10px 0}
+.logo img{height:60px}
+.school{font-family:'Arial Black';text-align:center;font-size:11pt;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:11pt}
+td{border:1px solid #000;padding:4px}
+.inst{border:1px solid #000;margin-top:10px;padding:10px}
+.inst-title{text-align:center;font-weight:bold}
+.inst ul{font-size:10pt;font-style:italic;line-height:1;padding-left:0.75cm}
+.q{margin-top:15px}
+.q-title{background:#D9D9D9;padding:4px;font-weight:bold}
+.editor{margin-top:5px}
+.toolbar{position:sticky;top:0;background:#fff;padding:5px;border-bottom:1px solid #ccc}
 button{margin-right:5px}
 </style>
 </head>
 <body>
 
 <div class="toolbar">
-<select onchange="document.execCommand('fontName',false,this.value)">
-<option>Arial</option>
-<option>Calibri</option>
-<option>Trebuchet MS</option>
-</select>
-
 <button onclick="document.execCommand('bold')"><b>B</b></button>
 <button onclick="document.execCommand('italic')"><i>I</i></button>
 <button onclick="document.execCommand('underline')"><u>U</u></button>
-
-<button onclick="document.execCommand('justifyLeft')">Esq</button>
-<button onclick="document.execCommand('justifyCenter')">Centro</button>
-<button onclick="document.execCommand('justifyRight')">Dir</button>
-<button onclick="document.execCommand('justifyFull')">Just</button>
+<button onclick="document.execCommand('justifyLeft')">E</button>
+<button onclick="document.execCommand('justifyCenter')">C</button>
+<button onclick="document.execCommand('justifyRight')">D</button>
+<button onclick="dup()">Duplicar Questão</button>
 </div>
 
-<div class="editor" contenteditable="true">
-<h3>QUESTÃO 01 – VALOR: 1,0 PONTOS</h3>
-<p>Digite aqui seu enunciado...</p>
+<div class="page" contenteditable="true" id="editor">
+
+<div class="topbar"></div>
+
+<div class="logo">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/SESI_logo.svg/512px-SESI_logo.svg.png">
+</div>
+
+<div class="school">ALBERTO MARTINS FONTOURA BORGES</div>
+
+<table>
+<tr>
+<td><b>Atividade:</b> Avaliação</td>
+<td><b>Disciplina:</b> LITERATURA</td>
+<td><b>Turno:</b> Matutino</td>
+</tr>
+<tr>
+<td><b>Segmento:</b> Ensino Fundamental</td>
+<td><b>Professor:</b> THALES GARCIA</td>
+<td><b>Data:</b> __/__/2026</td>
+</tr>
+<tr>
+<td><b>Turma:</b> EF-7</td>
+<td><b>Valor:</b> 10</td>
+<td><b>Nota Final:</b></td>
+</tr>
+</table>
+
+<div class="inst">
+<div class="inst-title">Instruções</div>
+<ul>
+<li>Leia com atenção.</li>
+<li>Use caneta azul ou preta.</li>
+</ul>
+</div>
+
+<div class="q" id="q1">
+<div class="q-title">QUESTÃO 01 – VALOR: 1,0</div>
+<div class="editor">
+<p>Digite o enunciado...</p>
 <p><b>A)</b> Alternativa</p>
 <p><b>B)</b> Alternativa</p>
 <p><b>C)</b> Alternativa</p>
 <p><b>D)</b> Alternativa</p>
 </div>
+</div>
+
+</div>
+
+<script>
+function dup(){
+let q=document.getElementById('q1');
+let clone=q.cloneNode(true);
+document.getElementById('editor').appendChild(clone);
+}
+</script>
 
 </body>
 </html>
