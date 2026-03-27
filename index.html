@@ -101,7 +101,14 @@ table.doc-meta td{border:1px solid #000;padding:4px 6px;vertical-align:top}
 .richbox:focus,.richbox.is-active{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(30,77,155,.10)}
 .q-card.is-active{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(30,77,155,.08)}
 .q-tools{display:flex;gap:8px;flex-wrap:wrap}
+.richbox[contenteditable="true"]{cursor:text}
 .q-image-preview{max-width:220px;display:block;margin:8px auto}
+.editor-toolbar .mini.is-on{background:var(--azul);color:#fff;border-color:var(--azul)}
+.editor-toolbar .mini.is-on b,.editor-toolbar .mini.is-on i,.editor-toolbar .mini.is-on u{color:#fff}
+.q-card{position:relative}
+.q-drag-hint{font-size:.78rem;color:var(--muted);margin-top:4px}
+.richbox{position:relative}
+.richbox[data-dragging="true"]{opacity:.8}
 @media (max-width:1200px){.editor-shell{grid-template-columns:1fr}}
 
 </style>
@@ -389,25 +396,37 @@ function getCab(){
   };
 }
 
+function defaultBlockStyle(){
+  return { fontFamily:'Arial, sans-serif', fontSize:'11pt', lineHeight:'1.15', textIndent:'0cm', marginLeft:'0px', marginTop:'0px', width:'100%', minHeight:'42px', textAlign:'left' };
+}
+function normalizeQuestion(q){
+  q.alternativas = Array.isArray(q.alternativas) ? q.alternativas : altLetters().map(()=>'' );
+  q.blockStyles = q.blockStyles || {};
+  q.blockStyles.enunciado = {...defaultBlockStyle(), ...(q.blockStyles.enunciado||{})};
+  q.blockStyles.alternativas = altLetters().map((_,i)=>({...defaultBlockStyle(), minHeight:'42px', ...(q.blockStyles.alternativas?.[i]||{})}));
+  return q;
+}
 function addQuestion(type){
-  const q = {id: crypto.randomUUID(), type, valor:'1,0', enunciado:'', alternativas: altLetters().map(()=>''), linhas:5, imageSrc:'', imageRef:'', imageWidth:160 };
+  const q = normalizeQuestion({id: crypto.randomUUID(), type, valor:'1,0', enunciado:'', alternativas: altLetters().map(()=>''), linhas:5, imageSrc:'', imageRef:'', imageWidth:160 });
   state.questions.push(q); renderQuestions(); renderEvalPreview();
 }
 function renderQuestions(){
   const wrap = $("questionsWrap");
   wrap.innerHTML = "";
   state.questions.forEach((q, idx) => {
+    q = normalizeQuestion(q);
     const letters = altLetters();
     q.alternativas = letters.map((_,i)=>q.alternativas[i] || "");
     const div = document.createElement('div');
     div.className = 'q-card';
     const imgHtml = q.imageSrc ? `<img src="${q.imageSrc}" class="q-image-preview" style="width:${q.imageWidth||160}px"><div class="small" style="text-align:center">${esc(q.imageRef||'')}</div>` : '';
-    let html = `<div class="q-head"><strong>QUESTÃO ${String(idx+1).padStart(2,'0')}</strong><div class="q-tools"><input class="input" style="width:90px" data-id="${q.id}" data-field="valor" value="${q.valor}"><button class="btn btn-secondary" data-up="${q.id}" title="Mover para cima">↑</button><button class="btn btn-secondary" data-down="${q.id}" title="Mover para baixo">↓</button><button class="btn btn-secondary" data-dup="${q.id}">Duplicar</button><button class="btn btn-danger" data-del="${q.id}">Excluir</button></div></div>
-    <div class="field"><label>Enunciado</label><div class="richbox" contenteditable="true" data-id="${q.id}" data-field="enunciado">${q.enunciado||''}</div></div>
+    let html = `<div class="q-head"><strong>QUESTÃO ${String(idx+1).padStart(2,'0')}</strong><div class="q-tools"><input class="input" style="width:90px" data-id="${q.id}" data-field="valor" value="${q.valor}"><button class="btn btn-secondary" data-up="${q.id}" title="Mover para cima">↑</button><button class="btn btn-secondary" data-down="${q.id}" title="Mover para baixo">↓</button><button class="btn btn-secondary" data-dup="${q.id}">Duplicar</button><button class="btn btn-secondary" data-move="${q.id}" title="Arraste o bloco">Mover</button><button class="btn btn-danger" data-del="${q.id}">Excluir</button></div></div>
+    <div class="q-drag-hint">Selecione um bloco para editar. Você pode arrastar o texto para reposicionar e excluir com aviso.</div>
+    <div class="field"><label>Enunciado</label><div class="richbox" contenteditable="true" draggable="true" data-id="${q.id}" data-field="enunciado" style="${inlineStyleText(q.blockStyles.enunciado)}">${q.enunciado||''}</div></div>
     <div class="grid3"><div class="field"><label>Imagem</label><input class="input" type="file" accept="image/*" data-id="${q.id}" data-file="image"></div><div class="field"><label>Largura imagem (px)</label><input class="input" type="number" data-id="${q.id}" data-field="imageWidth" value="${q.imageWidth||160}"></div><div class="field"><label>Referência</label><input class="input" data-id="${q.id}" data-field="imageRef" value="${q.imageRef||''}"></div></div>${imgHtml}`;
     if(q.type === 'objetiva'){
       letters.forEach((lt,i)=> {
-        html += `<div class="field"><label>${lt})</label><div class="richbox alt" contenteditable="true" data-id="${q.id}" data-alt="${i}">${q.alternativas[i]||''}</div></div>`;
+        html += `<div class="field"><label>${lt})</label><div class="richbox alt" contenteditable="true" draggable="true" data-id="${q.id}" data-alt="${i}" style="${inlineStyleText(q.blockStyles.alternativas[i])}">${q.alternativas[i]||''}</div></div>`;
       });
     } else {
       html += `<div class="field"><label>Quantidade de linhas</label><input class="input" type="number" min="1" data-id="${q.id}" data-field="linhas" value="${q.linhas}"></div>`;
@@ -416,18 +435,105 @@ function renderQuestions(){
     wrap.appendChild(div);
   });
 }
+
+function inlineStyleText(styleObj={}){
+  return Object.entries(styleObj).map(([k,v])=>`${k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())}:${v}`).join(';');
+}
+function getSelectionRangeIn(el){
+  const sel = window.getSelection();
+  if(!sel || !sel.rangeCount) return null;
+  const range = sel.getRangeAt(0);
+  if(!el.contains(range.commonAncestorContainer)) return null;
+  return range;
+}
+function applyStyleToSelection(el, styles){
+  const range = getSelectionRangeIn(el);
+  if(range && !range.collapsed){
+    const span = document.createElement('span');
+    Object.assign(span.style, styles);
+    try {
+      const contents = range.extractContents();
+      span.appendChild(contents);
+      range.insertNode(span);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.selectNodeContents(span);
+      sel.addRange(newRange);
+    } catch(err){
+      Object.assign(el.style, styles);
+    }
+  } else {
+    Object.assign(el.style, styles);
+  }
+}
+
 function bindQuestions(){
   let activeEditor = null;
+  let savedRange = null;
+  let dragTarget = null;
   const wrap = $("questionsWrap");
+
+  function saveSelection(){
+    const sel = window.getSelection();
+    if(sel && sel.rangeCount) savedRange = sel.getRangeAt(0).cloneRange();
+  }
+  function restoreSelection(el){
+    if(!savedRange || !el) return;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    try { sel.addRange(savedRange); } catch(err) {}
+  }
+  function updateToolbarState(){
+    document.querySelectorAll('[data-rt]').forEach(btn=>btn.classList.remove('is-on'));
+    if(!activeEditor) return;
+    const map = [
+      ['bold','bold'],['italic','italic'],['underline','underline'],
+      ['justifyLeft','justify-left'],['justifyCenter','justify-center'],['justifyRight','justify-right'],['justifyFull','justify-full']
+    ];
+    map.forEach(([cmd,cls])=>{ try{ if(document.queryCommandState(cmd)) document.querySelector(`[data-rt="${cmd}"]`)?.classList.add('is-on'); }catch(err){} });
+    const align = getComputedStyle(activeEditor).textAlign;
+    const alignBtn = align === 'center' ? 'justifyCenter' : align === 'right' ? 'justifyRight' : align === 'justify' ? 'justifyFull' : 'justifyLeft';
+    document.querySelector(`[data-rt="${alignBtn}"]`)?.classList.add('is-on');
+  }
 
   wrap.addEventListener('focusin', e=>{
     if(e.target.classList.contains('richbox')) setActiveEditor(e.target);
   });
+  wrap.addEventListener('mouseup', e=>{ if(e.target.classList.contains('richbox')) { saveSelection(); updateToolbarState(); } });
+  wrap.addEventListener('keyup', e=>{ if(e.target.classList.contains('richbox')) { saveSelection(); updateToolbarState(); persistActive(e.target); } });
   wrap.addEventListener('focusout', e=>{
     if(e.target.classList.contains('richbox')){
       e.target.classList.remove('is-active');
       e.target.closest('.q-card')?.classList.remove('is-active');
     }
+  });
+  wrap.addEventListener('dragstart', e=>{
+    if(!e.target.classList.contains('richbox')) return;
+    dragTarget = e.target;
+    e.target.dataset.dragging = 'true';
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  wrap.addEventListener('dragend', e=>{
+    if(e.target.classList.contains('richbox')) delete e.target.dataset.dragging;
+    dragTarget = null;
+  });
+  wrap.addEventListener('dragover', e=>{
+    if(!dragTarget || !e.target.classList.contains('richbox') || e.target === dragTarget) return;
+    e.preventDefault();
+  });
+  wrap.addEventListener('drop', e=>{
+    if(!dragTarget || !e.target.classList.contains('richbox') || e.target === dragTarget) return;
+    e.preventDefault();
+    const targetRect = e.target.getBoundingClientRect();
+    const targetX = e.clientX - targetRect.left;
+    const targetY = e.clientY - targetRect.top;
+    dragTarget.style.marginLeft = `${Math.max(0, Math.round(targetX - 20))}px`;
+    dragTarget.style.marginTop = `${Math.max(0, Math.round(targetY - 12))}px`;
+    if(dragTarget.style.width === '100%') dragTarget.style.width = `${Math.max(200, Math.round(targetRect.width))}px`;
+    persistActive(dragTarget);
+    syncEditorProps(dragTarget);
+    renderEvalPreview();
   });
   wrap.addEventListener('keydown', e=>{
     if(!e.target.classList.contains('richbox')) return;
@@ -435,21 +541,30 @@ function bindQuestions(){
       e.preventDefault();
       document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
       persistActive(e.target);
+      saveSelection();
+      return;
+    }
+    if(e.key === 'Enter'){
+      document.execCommand('insertHTML', false, '<div><br></div>');
+      e.preventDefault();
+      persistActive(e.target);
+      saveSelection();
     }
   });
   wrap.addEventListener('input', e=>{
     const id = e.target.dataset.id; if(!id) return;
-    const q = state.questions.find(x=>x.id===id); if(!q) return;
+    const q = state.questions.find(x=>x.id===id); if(!q) return; normalizeQuestion(q);
     if(e.target.classList.contains('richbox')){
       if(e.target.dataset.field) q[e.target.dataset.field] = e.target.innerHTML;
       if(e.target.dataset.alt !== undefined) q.alternativas[Number(e.target.dataset.alt)] = e.target.innerHTML;
+      saveSelection();
     }
     if(e.target.dataset.field && !e.target.classList.contains('richbox')) q[e.target.dataset.field] = e.target.value;
     renderEvalPreview();
   });
   wrap.addEventListener('change', e=>{
     const id = e.target.dataset.id; if(!id) return;
-    const q = state.questions.find(x=>x.id===id); if(!q) return;
+    const q = state.questions.find(x=>x.id===id); if(!q) return; normalizeQuestion(q);
     if(e.target.dataset.file === 'image'){
       const file = e.target.files?.[0];
       if(!file) return;
@@ -463,7 +578,7 @@ function bindQuestions(){
   });
   wrap.addEventListener('click', e=>{
     const del = e.target.dataset.del; const dup = e.target.dataset.dup;
-    const up = e.target.dataset.up; const down = e.target.dataset.down;
+    const up = e.target.dataset.up; const down = e.target.dataset.down; const move = e.target.dataset.move;
     if(del){
       const q = state.questions.find(x=>x.id===del);
       if(!q) return;
@@ -476,6 +591,11 @@ function bindQuestions(){
       const copy = JSON.parse(JSON.stringify(q)); copy.id = crypto.randomUUID();
       state.questions.splice(state.questions.indexOf(q)+1,0,copy);
       renderQuestions(); renderEvalPreview(); return;
+    }
+    if(move){
+      const block = wrap.querySelector(`.richbox[data-id="${move}"][data-field="enunciado"]`);
+      if(block) { setActiveEditor(block); block.focus(); }
+      return;
     }
     if(up){
       const idx = state.questions.findIndex(x=>x.id===up); if(idx<=0) return;
@@ -492,14 +612,22 @@ function bindQuestions(){
   document.querySelectorAll('[data-rt]').forEach(btn=>btn.addEventListener('click', ()=>{
     if(!activeEditor) return;
     activeEditor.focus();
+    restoreSelection(activeEditor);
     const cmd = btn.dataset.rt;
-    if(cmd==='fontName') return;
-    document.execCommand(cmd,false,null);
+    if(['justifyLeft','justifyCenter','justifyRight','justifyFull'].includes(cmd)){
+      const alignMap={justifyLeft:'left',justifyCenter:'center',justifyRight:'right',justifyFull:'justify'};
+      applyInlineStyle(activeEditor,{textAlign: alignMap[cmd]});
+      activeEditor.style.textAlign = alignMap[cmd];
+    } else {
+      document.execCommand(cmd,false,null);
+    }
+    saveSelection();
+    updateToolbarState();
     persistActive(activeEditor);
   }));
-  $("rtFont").addEventListener('change', ()=>{ if(!activeEditor) return; activeEditor.focus(); document.execCommand('fontName', false, $("rtFont").value); persistActive(activeEditor); });
-  $("rtSize").addEventListener('change', ()=>{ if(!activeEditor) return; applyInlineStyle(activeEditor,{fontSize: $("rtSize").value+'pt'}); persistActive(activeEditor); });
-  ["propFontFam","propFontSize","propLineHeight","propIndent","propPosX","propPosY","propWidth","propMinHeight"].forEach(id=>$(id).addEventListener('input', ()=>{ if(!activeEditor) return; applySideProps(activeEditor); persistActive(activeEditor); }));
+  $("rtFont").addEventListener('change', ()=>{ if(!activeEditor) return; activeEditor.focus(); restoreSelection(activeEditor); applyInlineStyle(activeEditor,{fontFamily: $("rtFont").value}); saveSelection(); persistActive(activeEditor); syncEditorProps(activeEditor); });
+  $("rtSize").addEventListener('change', ()=>{ if(!activeEditor) return; activeEditor.focus(); restoreSelection(activeEditor); applyInlineStyle(activeEditor,{fontSize: $("rtSize").value+'pt'}); saveSelection(); persistActive(activeEditor); syncEditorProps(activeEditor); });
+  ["propFontFam","propFontSize","propLineHeight","propIndent","propPosX","propPosY","propWidth","propMinHeight"].forEach(id=>$(id).addEventListener('input', ()=>{ if(!activeEditor) return; applySideProps(activeEditor); persistActive(activeEditor); syncEditorProps(activeEditor); }));
 
   function setActiveEditor(el){
     wrap.querySelectorAll('.richbox.is-active').forEach(node=>node.classList.remove('is-active'));
@@ -508,36 +636,59 @@ function bindQuestions(){
     el.classList.add('is-active');
     el.closest('.q-card')?.classList.add('is-active');
     syncEditorProps(activeEditor);
+    updateToolbarState();
   }
   function persistActive(el){
-    const id = el.dataset.id; const q = state.questions.find(x=>x.id===id); if(!q) return;
-    if(el.dataset.field) q[el.dataset.field] = el.innerHTML;
-    if(el.dataset.alt !== undefined) q.alternativas[Number(el.dataset.alt)] = el.innerHTML;
+    const id = el.dataset.id; const q = state.questions.find(x=>x.id===id); if(!q) return; normalizeQuestion(q);
+    if(el.dataset.field) {
+      q[el.dataset.field] = el.innerHTML;
+      q.blockStyles[el.dataset.field] = collectBlockStyle(el);
+    }
+    if(el.dataset.alt !== undefined) {
+      const idx = Number(el.dataset.alt);
+      q.alternativas[idx] = el.innerHTML;
+      q.blockStyles.alternativas[idx] = collectBlockStyle(el);
+    }
     renderEvalPreview();
   }
   function syncEditorProps(el){
     const cs = getComputedStyle(el);
     const fam = cs.fontFamily.replace(/"/g,'');
     if([...( $("propFontFam").options )].some(opt=>opt.value===fam)) $("propFontFam").value = fam;
+    if([...( $("rtFont").options )].some(opt=>opt.value===fam)) $("rtFont").value = fam;
     $("propFontSize").value = (parseFloat(cs.fontSize) * 0.75).toFixed(2).replace(/\.00$/,'');
+    $("rtSize").value = (parseFloat(cs.fontSize) * 0.75).toFixed(2).replace(/\.00$/,'');
     const lh = cs.lineHeight==='normal' ? 1.15 : (parseFloat(cs.lineHeight)/parseFloat(cs.fontSize));
-    $("propLineHeight").value = String(Number(lh.toFixed(2)));
+    $("propLineHeight").value = ['1','1.15'].includes(String(Number(lh.toFixed(2)))) ? String(Number(lh.toFixed(2))) : '1.15';
     $("propIndent").value = ((parseFloat(cs.textIndent||0)/37.7952755906) || 0).toFixed(2);
     $("propPosX").value = parseInt(el.style.marginLeft||0) || 0;
     $("propPosY").value = parseInt(el.style.marginTop||0) || 0;
-    $("propWidth").value = parseInt(el.style.width||el.offsetWidth) || el.offsetWidth;
+    $("propWidth").value = el.style.width && el.style.width.endsWith('px') ? parseInt(el.style.width) : 100;
     $("propMinHeight").value = parseInt(el.style.minHeight||el.offsetHeight) || el.offsetHeight;
   }
-  function applyInlineStyle(el, styles){ Object.assign(el.style, styles); }
+  function collectBlockStyle(el){
+    return {
+      fontFamily: el.style.fontFamily || 'Arial, sans-serif',
+      fontSize: el.style.fontSize || '11pt',
+      lineHeight: el.style.lineHeight || '1.15',
+      textIndent: el.style.textIndent || '0cm',
+      marginLeft: el.style.marginLeft || '0px',
+      marginTop: el.style.marginTop || '0px',
+      width: el.style.width || '100%',
+      minHeight: el.style.minHeight || '42px',
+      textAlign: el.style.textAlign || 'left'
+    };
+  }
+  function applyInlineStyle(el, styles){ applyStyleToSelection(el, styles); }
   function applySideProps(el){
-    applyInlineStyle(el, {
+    Object.assign(el.style, {
       fontFamily: $("propFontFam").value,
       fontSize: $("propFontSize").value + 'pt',
       lineHeight: $("propLineHeight").value,
       textIndent: $("propIndent").value + 'cm',
       marginLeft: $("propPosX").value + 'px',
       marginTop: $("propPosY").value + 'px',
-      width: $("propWidth").value + 'px',
+      width: $("propWidth").value === '100' ? '100%' : $("propWidth").value + 'px',
       minHeight: $("propMinHeight").value + 'px'
     });
   }
@@ -548,13 +699,15 @@ function renderDocHTML(tpl, cab, questions, includeInst=true){
   const upperProf = cab.professor ? cab.professor.toUpperCase() : "";
   const upperTurma = cab.turma ? cab.turma.toUpperCase() : "";
   const docQs = questions.map((q,idx)=>{
+    normalizeQuestion(q);
+    const enStyle = inlineStyleText(q.blockStyles.enunciado);
     const options = (q.type === 'objetiva')
-      ? q.alternativas.map((a,i)=>`<div class="doc-option" style="font-family:${tpl.questionBodyFont};font-size:${tpl.questionBodySizePt}pt;line-height:${tpl.optionsLineHeight}"><strong>${altLetters()[i]})</strong> ${a||''}</div>`).join("")
+      ? q.alternativas.map((a,i)=>`<div class="doc-option" style="font-family:${tpl.questionBodyFont};font-size:${tpl.questionBodySizePt}pt;line-height:${tpl.optionsLineHeight};margin-top:4px"><strong>${altLetters()[i]})</strong> <span style="${inlineStyleText(q.blockStyles.alternativas[i])}">${a||''}</span></div>`).join("")
       : Array.from({length:Number(q.linhas)||5}).map(()=>`<div class="doc-line"></div>`).join("");
-    const media = q.imageSrc ? `<div style="text-align:center;margin:8px 0"><img src="${q.imageSrc}" style="max-width:${q.imageWidth||160}px;width:100%;display:inline-block"><div style="font-family:Arial,sans-serif;font-size:10pt;text-align:center">${esc(q.imageRef||'')}</div></div>` : '';
+    const media = q.imageSrc ? `<div style="text-align:center;margin:8px 0"><img src="${q.imageSrc}" style="max-width:${q.imageWidth||160}px;width:auto;display:inline-block"><div style="font-family:Arial,sans-serif;font-size:10pt;text-align:center">${esc(q.imageRef||'')}</div></div>` : '';
     return `<div class="doc-q" style="margin-top:${idx===0?0:tpl.questionGapBetweenPt}pt">
-      <div class="doc-qbar" style="background:${tpl.qBarBg};font-size:${tpl.qBarSize}pt;font-family:Arial,sans-serif">QUESTÃO ${String(idx+1).padStart(2,'0')} – VALOR: ${esc(q.valor)} PONTOS</div>
-      <div class="doc-qbody" style="margin-top:${tpl.qGapAfterBar}pt;font-size:${tpl.qBodySize}pt;line-height:${tpl.qBodyLineHeight};font-family:Arial,sans-serif;text-align:justify">${q.enunciado||''}</div>
+      <div class="doc-qbar" style="background:${tpl.questionBarBg};font-size:${tpl.questionBarSizePt}pt;font-family:${tpl.questionBarFont};font-weight:700">QUESTÃO ${String(idx+1).padStart(2,'0')} – VALOR: ${esc(q.valor)} PONTOS</div>
+      <div class="doc-qbody" style="margin-top:${tpl.questionGapAfterBarPt}pt;font-size:${tpl.questionBodySizePt}pt;line-height:${tpl.questionBodyLineHeight};font-family:${tpl.questionBodyFont};text-align:justify;${enStyle}">${q.enunciado||''}</div>
       ${media}
       <div style="margin-top:8px">${options}</div>
     </div>`;
@@ -767,8 +920,8 @@ function applyMode(mode){
   state.mode=mode;
   if(mode==='sesi' && !state.questions.length){
     state.questions = [
-      {id:crypto.randomUUID(), type:'objetiva', valor:'1,0', enunciado:'', alternativas:altLetters().map(()=>''), linhas:5},
-      {id:crypto.randomUUID(), type:'objetiva', valor:'1,0', enunciado:'', alternativas:altLetters().map(()=>''), linhas:5}
+      normalizeQuestion({id:crypto.randomUUID(), type:'objetiva', valor:'1,0', enunciado:'', alternativas:altLetters().map(()=>''), linhas:5}),
+      normalizeQuestion({id:crypto.randomUUID(), type:'objetiva', valor:'1,0', enunciado:'', alternativas:altLetters().map(()=>''), linhas:5})
     ];
   }
   renderQuestions(); renderEvalPreview();
@@ -822,7 +975,7 @@ $("dashGrid").addEventListener('click', async e=>{
   const id = e.target.dataset.edit || e.target.dataset.del; if(!id) return;
   if(e.target.dataset.del){ if(confirm("Excluir avaliação?")){ await db.collection("avaliacoes").doc(id).delete(); loadDashboard(); } return; }
   const ref = await db.collection("avaliacoes").doc(id).get(); if(!ref.exists) return;
-  const doc = ref.data(); state.editId=id; $("cabAtv").value=doc.cab.atividade||""; $("cabDisc").value=doc.cab.disciplina||""; $("cabTurno").value=doc.cab.turno||""; $("cabSeg").value=doc.cab.segmento||""; updateTurmas(); $("cabProf").value=doc.cab.professor||""; $("cabData").value=doc.cab.data||""; $("cabTurma").value=doc.cab.turma||""; $("cabValor").value=doc.cab.valor||""; $("cabNome").value=doc.cab.nome||""; state.questions=doc.questions||[]; renderQuestions(); renderEvalPreview(); switchView('editor');
+  const doc = ref.data(); state.editId=id; $("cabAtv").value=doc.cab.atividade||""; $("cabDisc").value=doc.cab.disciplina||""; $("cabTurno").value=doc.cab.turno||""; $("cabSeg").value=doc.cab.segmento||""; updateTurmas(); $("cabProf").value=doc.cab.professor||""; $("cabData").value=doc.cab.data||""; $("cabTurma").value=doc.cab.turma||""; $("cabValor").value=doc.cab.valor||""; $("cabNome").value=doc.cab.nome||""; state.questions=(doc.questions||[]).map(normalizeQuestion); renderQuestions(); renderEvalPreview(); switchView('editor');
 });
 bindQuestions(); bindTemplateForm(); bindCfg(); applyDateMask();
 
