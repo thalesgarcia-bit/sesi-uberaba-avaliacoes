@@ -98,7 +98,8 @@ table.doc-meta td{border:1px solid #000;padding:4px 6px;vertical-align:top}
 .editor-props{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbfcfe;display:flex;flex-direction:column;gap:10px}
 .richbox{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;min-height:90px;outline:none;line-height:1.15;white-space:pre-wrap}
 .richbox.alt{min-height:42px}
-.richbox:focus{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(30,77,155,.10)}
+.richbox:focus,.richbox.is-active{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(30,77,155,.10)}
+.q-card.is-active{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(30,77,155,.08)}
 .q-tools{display:flex;gap:8px;flex-wrap:wrap}
 .q-image-preview{max-width:220px;display:block;margin:8px auto}
 @media (max-width:1200px){.editor-shell{grid-template-columns:1fr}}
@@ -198,7 +199,7 @@ table.doc-meta td{border:1px solid #000;padding:4px 6px;vertical-align:top}
               <button class="btn btn-primary" id="btnAddObj">+ Objetiva</button>
               <button class="btn btn-secondary" id="btnAddDis">+ Discursiva</button>
             </div>
-            <div class="editor-shell"><div><div class="editor-toolbar"><select class="select" id="rtFont" style="width:180px"><option>Arial, sans-serif</option><option>Arial Black, Arial, sans-serif</option><option>Calibri, Arial, sans-serif</option><option>Trebuchet MS, Arial, sans-serif</option></select><input class="input" id="rtSize" type="number" step="0.1" value="11" style="width:80px"><button class="mini" type="button" data-rt="bold"><b>B</b></button><button class="mini" type="button" data-rt="italic"><i>I</i></button><button class="mini" type="button" data-rt="underline"><u>U</u></button><button class="mini" type="button" data-rt="justifyLeft">⟸</button><button class="mini" type="button" data-rt="justifyCenter">≡</button><button class="mini" type="button" data-rt="justifyRight">⟹</button><button class="mini" type="button" data-rt="justifyFull">☰</button></div><div id="questionsWrap" class="stack" style="margin-top:12px"></div></div><aside class="editor-props"><strong style="color:var(--azul)">Painel lateral</strong><div class="field"><label>Fonte detalhada</label><select class="select" id="propFontFam"><option>Arial, sans-serif</option><option>Arial Black, Arial, sans-serif</option><option>Calibri, Arial, sans-serif</option><option>Trebuchet MS, Arial, sans-serif</option></select></div><div class="grid2"><div class="field"><label>Tamanho (pt)</label><input class="input" id="propFontSize" type="number" step="0.1" value="11"></div><div class="field"><label>Entrelinhas</label><select class="select" id="propLineHeight"><option value="1">1.0</option><option value="1.15" selected>1.15</option></select></div><div class="field"><label>Recuo esquerdo</label><input class="input" id="propIndent" type="number" step="0.01" value="0"></div><div class="field"><label>Posição X</label><input class="input" id="propPosX" type="number" step="1" value="0"></div><div class="field"><label>Posição Y</label><input class="input" id="propPosY" type="number" step="1" value="0"></div><div class="field"><label>Largura</label><input class="input" id="propWidth" type="number" step="1" value="100"></div></div><div class="small">Selecione um bloco de texto no editor para aplicar estes ajustes.</div></aside></div>
+            <div class="editor-shell"><div><div class="editor-toolbar"><select class="select" id="rtFont" style="width:180px"><option>Arial, sans-serif</option><option>Arial Black, Arial, sans-serif</option><option>Calibri, Arial, sans-serif</option><option>Trebuchet MS, Arial, sans-serif</option></select><input class="input" id="rtSize" type="number" step="0.1" value="11" style="width:80px"><button class="mini" type="button" data-rt="bold"><b>B</b></button><button class="mini" type="button" data-rt="italic"><i>I</i></button><button class="mini" type="button" data-rt="underline"><u>U</u></button><button class="mini" type="button" data-rt="justifyLeft">⟸</button><button class="mini" type="button" data-rt="justifyCenter">≡</button><button class="mini" type="button" data-rt="justifyRight">⟹</button><button class="mini" type="button" data-rt="justifyFull">☰</button></div><div id="questionsWrap" class="stack" style="margin-top:12px"></div></div><aside class="editor-props"><strong style="color:var(--azul)">Painel lateral</strong><div class="field"><label>Fonte detalhada</label><select class="select" id="propFontFam"><option>Arial, sans-serif</option><option>Arial Black, Arial, sans-serif</option><option>Calibri, Arial, sans-serif</option><option>Trebuchet MS, Arial, sans-serif</option></select></div><div class="grid2"><div class="field"><label>Tamanho (pt)</label><input class="input" id="propFontSize" type="number" step="0.1" value="11"></div><div class="field"><label>Entrelinhas</label><select class="select" id="propLineHeight"><option value="1">1.0</option><option value="1.15" selected>1.15</option></select></div><div class="field"><label>Recuo esquerdo</label><input class="input" id="propIndent" type="number" step="0.01" value="0"></div><div class="field"><label>Posição X</label><input class="input" id="propPosX" type="number" step="1" value="0"></div><div class="field"><label>Posição Y</label><input class="input" id="propPosY" type="number" step="1" value="0"></div><div class="field"><label>Largura</label><input class="input" id="propWidth" type="number" step="1" value="100"></div><div class="field"><label>Altura mínima</label><input class="input" id="propMinHeight" type="number" step="1" value="42"></div></div><div class="small">Selecione um bloco de texto no editor para aplicar estes ajustes. Tab cria recuo, Enter cria nova linha e os blocos podem ser reposicionados.</div></aside></div>
           </div>
           <div class="card">
             <div class="mode-row">
@@ -401,7 +402,7 @@ function renderQuestions(){
     const div = document.createElement('div');
     div.className = 'q-card';
     const imgHtml = q.imageSrc ? `<img src="${q.imageSrc}" class="q-image-preview" style="width:${q.imageWidth||160}px"><div class="small" style="text-align:center">${esc(q.imageRef||'')}</div>` : '';
-    let html = `<div class="q-head"><strong>QUESTÃO ${String(idx+1).padStart(2,'0')}</strong><div class="q-tools"><input class="input" style="width:90px" data-id="${q.id}" data-field="valor" value="${q.valor}"><button class="btn btn-secondary" data-dup="${q.id}">Duplicar</button><button class="btn btn-danger" data-del="${q.id}">Excluir</button></div></div>
+    let html = `<div class="q-head"><strong>QUESTÃO ${String(idx+1).padStart(2,'0')}</strong><div class="q-tools"><input class="input" style="width:90px" data-id="${q.id}" data-field="valor" value="${q.valor}"><button class="btn btn-secondary" data-up="${q.id}" title="Mover para cima">↑</button><button class="btn btn-secondary" data-down="${q.id}" title="Mover para baixo">↓</button><button class="btn btn-secondary" data-dup="${q.id}">Duplicar</button><button class="btn btn-danger" data-del="${q.id}">Excluir</button></div></div>
     <div class="field"><label>Enunciado</label><div class="richbox" contenteditable="true" data-id="${q.id}" data-field="enunciado">${q.enunciado||''}</div></div>
     <div class="grid3"><div class="field"><label>Imagem</label><input class="input" type="file" accept="image/*" data-id="${q.id}" data-file="image"></div><div class="field"><label>Largura imagem (px)</label><input class="input" type="number" data-id="${q.id}" data-field="imageWidth" value="${q.imageWidth||160}"></div><div class="field"><label>Referência</label><input class="input" data-id="${q.id}" data-field="imageRef" value="${q.imageRef||''}"></div></div>${imgHtml}`;
     if(q.type === 'objetiva'){
@@ -417,13 +418,26 @@ function renderQuestions(){
 }
 function bindQuestions(){
   let activeEditor = null;
-  $("questionsWrap").addEventListener('focusin', e=>{
+  const wrap = $("questionsWrap");
+
+  wrap.addEventListener('focusin', e=>{
+    if(e.target.classList.contains('richbox')) setActiveEditor(e.target);
+  });
+  wrap.addEventListener('focusout', e=>{
     if(e.target.classList.contains('richbox')){
-      activeEditor = e.target;
-      syncEditorProps(activeEditor);
+      e.target.classList.remove('is-active');
+      e.target.closest('.q-card')?.classList.remove('is-active');
     }
   });
-  $("questionsWrap").addEventListener('input', e=>{
+  wrap.addEventListener('keydown', e=>{
+    if(!e.target.classList.contains('richbox')) return;
+    if(e.key === 'Tab'){
+      e.preventDefault();
+      document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
+      persistActive(e.target);
+    }
+  });
+  wrap.addEventListener('input', e=>{
     const id = e.target.dataset.id; if(!id) return;
     const q = state.questions.find(x=>x.id===id); if(!q) return;
     if(e.target.classList.contains('richbox')){
@@ -433,7 +447,7 @@ function bindQuestions(){
     if(e.target.dataset.field && !e.target.classList.contains('richbox')) q[e.target.dataset.field] = e.target.value;
     renderEvalPreview();
   });
-  $("questionsWrap").addEventListener('change', e=>{
+  wrap.addEventListener('change', e=>{
     const id = e.target.dataset.id; if(!id) return;
     const q = state.questions.find(x=>x.id===id); if(!q) return;
     if(e.target.dataset.file === 'image'){
@@ -447,10 +461,32 @@ function bindQuestions(){
     if(e.target.dataset.field) q[e.target.dataset.field] = e.target.value;
     renderEvalPreview();
   });
-  $("questionsWrap").addEventListener('click', e=>{
+  wrap.addEventListener('click', e=>{
     const del = e.target.dataset.del; const dup = e.target.dataset.dup;
-    if(del){ state.questions = state.questions.filter(q=>q.id!==del); renderQuestions(); renderEvalPreview(); return; }
-    if(dup){ const q = state.questions.find(x=>x.id===dup); if(!q) return; const copy = JSON.parse(JSON.stringify(q)); copy.id = crypto.randomUUID(); state.questions.splice(state.questions.indexOf(q)+1,0,copy); renderQuestions(); renderEvalPreview(); }
+    const up = e.target.dataset.up; const down = e.target.dataset.down;
+    if(del){
+      const q = state.questions.find(x=>x.id===del);
+      if(!q) return;
+      if(!confirm('Excluir esta questão? Esta ação remove o bloco atual.')) return;
+      state.questions = state.questions.filter(item=>item.id!==del);
+      renderQuestions(); renderEvalPreview(); return;
+    }
+    if(dup){
+      const q = state.questions.find(x=>x.id===dup); if(!q) return;
+      const copy = JSON.parse(JSON.stringify(q)); copy.id = crypto.randomUUID();
+      state.questions.splice(state.questions.indexOf(q)+1,0,copy);
+      renderQuestions(); renderEvalPreview(); return;
+    }
+    if(up){
+      const idx = state.questions.findIndex(x=>x.id===up); if(idx<=0) return;
+      [state.questions[idx-1], state.questions[idx]] = [state.questions[idx], state.questions[idx-1]];
+      renderQuestions(); renderEvalPreview(); return;
+    }
+    if(down){
+      const idx = state.questions.findIndex(x=>x.id===down); if(idx<0 || idx===state.questions.length-1) return;
+      [state.questions[idx+1], state.questions[idx]] = [state.questions[idx], state.questions[idx+1]];
+      renderQuestions(); renderEvalPreview();
+    }
   });
 
   document.querySelectorAll('[data-rt]').forEach(btn=>btn.addEventListener('click', ()=>{
@@ -463,8 +499,16 @@ function bindQuestions(){
   }));
   $("rtFont").addEventListener('change', ()=>{ if(!activeEditor) return; activeEditor.focus(); document.execCommand('fontName', false, $("rtFont").value); persistActive(activeEditor); });
   $("rtSize").addEventListener('change', ()=>{ if(!activeEditor) return; applyInlineStyle(activeEditor,{fontSize: $("rtSize").value+'pt'}); persistActive(activeEditor); });
-  ["propFontFam","propFontSize","propLineHeight","propIndent","propPosX","propPosY","propWidth"].forEach(id=>$(id).addEventListener('input', ()=>{ if(!activeEditor) return; applySideProps(activeEditor); persistActive(activeEditor); }));
+  ["propFontFam","propFontSize","propLineHeight","propIndent","propPosX","propPosY","propWidth","propMinHeight"].forEach(id=>$(id).addEventListener('input', ()=>{ if(!activeEditor) return; applySideProps(activeEditor); persistActive(activeEditor); }));
 
+  function setActiveEditor(el){
+    wrap.querySelectorAll('.richbox.is-active').forEach(node=>node.classList.remove('is-active'));
+    wrap.querySelectorAll('.q-card.is-active').forEach(node=>node.classList.remove('is-active'));
+    activeEditor = el;
+    el.classList.add('is-active');
+    el.closest('.q-card')?.classList.add('is-active');
+    syncEditorProps(activeEditor);
+  }
   function persistActive(el){
     const id = el.dataset.id; const q = state.questions.find(x=>x.id===id); if(!q) return;
     if(el.dataset.field) q[el.dataset.field] = el.innerHTML;
@@ -473,13 +517,16 @@ function bindQuestions(){
   }
   function syncEditorProps(el){
     const cs = getComputedStyle(el);
-    $("propFontFam").value = cs.fontFamily.replace(/"/g,'');
-    $("propFontSize").value = parseFloat(cs.fontSize) * 0.75;
-    $("propLineHeight").value = cs.lineHeight==='normal' ? 1.15 : (parseFloat(cs.lineHeight)/parseFloat(cs.fontSize)).toFixed(2);
-    $("propIndent").value = parseFloat(cs.textIndent||0)/16;
+    const fam = cs.fontFamily.replace(/"/g,'');
+    if([...( $("propFontFam").options )].some(opt=>opt.value===fam)) $("propFontFam").value = fam;
+    $("propFontSize").value = (parseFloat(cs.fontSize) * 0.75).toFixed(2).replace(/\.00$/,'');
+    const lh = cs.lineHeight==='normal' ? 1.15 : (parseFloat(cs.lineHeight)/parseFloat(cs.fontSize));
+    $("propLineHeight").value = String(Number(lh.toFixed(2)));
+    $("propIndent").value = ((parseFloat(cs.textIndent||0)/37.7952755906) || 0).toFixed(2);
     $("propPosX").value = parseInt(el.style.marginLeft||0) || 0;
     $("propPosY").value = parseInt(el.style.marginTop||0) || 0;
     $("propWidth").value = parseInt(el.style.width||el.offsetWidth) || el.offsetWidth;
+    $("propMinHeight").value = parseInt(el.style.minHeight||el.offsetHeight) || el.offsetHeight;
   }
   function applyInlineStyle(el, styles){ Object.assign(el.style, styles); }
   function applySideProps(el){
@@ -490,7 +537,8 @@ function bindQuestions(){
       textIndent: $("propIndent").value + 'cm',
       marginLeft: $("propPosX").value + 'px',
       marginTop: $("propPosY").value + 'px',
-      width: $("propWidth").value + 'px'
+      width: $("propWidth").value + 'px',
+      minHeight: $("propMinHeight").value + 'px'
     });
   }
 }
